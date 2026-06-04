@@ -83,6 +83,16 @@ decisions, color-code conventions, and formatting rules were directed by the
 author; Claude was used to write and iterate on the code. All output was
 reviewed and validated before release.
 
+## Acknowledgments
+
+Sharanya Singh Kanwar: initiated the idea for an automated Script-to-PPD converter and provided feedback through its development.
+
+## Built with
+- [JSZip](https://stuk.github.io/jszip/) — reads the .docx (MIT)
+- [docx](https://github.com/dolanmiu/docx) by Dolan Miu — writes the .docx (MIT)
+
+See [THIRD-PARTY-LICENSES.md](https://github.com/JiayuJiang59/Script-to-PPD-Converter/blob/main/Third-Party%20Licenses.md) for full license texts.
+
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE).
