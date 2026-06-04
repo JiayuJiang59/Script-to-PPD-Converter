@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script → PPD Converter</title>
+<style>
+  :root{
+    --bg:#faf9f6; --card:#ffffff; --ink:#1f2328; --muted:#6a737d;
+    --line:#e3e1da; --accent:#3a6ea5; --accent-d:#2c557f;
+    --green:#2e7d32; --red:#c00000; --soft:#f4f2ec;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5;
+    padding:24px 16px 80px;
+  }
+  .wrap{max-width:760px; margin:0 auto}
+  h1{font-size:1.45rem; margin:0 0 4px}
+  .sub{color:var(--muted); font-size:.92rem; margin:0 0 22px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; margin-bottom:16px;
+  }
+  .step-num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+    font-size:.8rem; font-weight:700; margin-right:8px; flex:0 0 auto;
+  }
+  .step-head{display:flex; align-items:center; font-weight:650; margin-bottom:12px; font-size:1.02rem}
+  label.opt{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--line);
+    border-radius:10px; margin-bottom:8px; cursor:pointer; transition:.15s; background:var(--card)}
+  label.opt:hover{border-color:var(--accent); background:var(--soft)}
+  label.opt input{margin-top:3px; flex:0 0 auto}
+  .opt .t{font-weight:600; font-size:.93rem}
+  .opt .d{color:var(--muted); font-size:.82rem; margin-top:2px}
+  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
+  .field label{font-size:.85rem; font-weight:600; color:var(--ink)}
+  .field input[type=text]{padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:.95rem}
+  .row2{display:flex; gap:12px}
+  .row2 .field{flex:1}
+  #drop{
+    border:2px dashed var(--line); border-radius:12px; padding:30px 16px; text-align:center;
+    color:var(--muted); cursor:pointer; transition:.15s; background:var(--soft);
+  }
+  #drop.hot{border-color:var(--accent); background:#eef4fa; color:var(--accent-d)}
+  #drop strong{color:var(--ink)}
+  .btn{
+    background:var(--accent); color:#fff; border:none; padding:13px 22px; border-radius:11px;
+    font-size:1rem; font-weight:650; cursor:pointer; width:100%; transition:.15s;
+  }
+  .btn:hover{background:var(--accent-d)}
+  .btn:disabled{background:#c9cdd2; cursor:not-allowed}
+  .hint{font-size:.82rem; color:var(--muted); margin-top:10px}
+  .swatch{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin-right:5px}
+  .status{margin-top:14px; padding:12px 14px; border-radius:10px; font-size:.9rem; display:none}
+  .status.ok{display:block; background:#eaf5ea; color:#205a23; border:1px solid #bfe0bf}
+  .status.err{display:block; background:#fbeaea; color:#9c2020; border:1px solid #e6bcbc}
+  .status.info{display:block; background:#eef4fa; color:var(--accent-d); border:1px solid #c7ddef}
+  .preview-tog{font-size:.85rem; color:var(--accent); cursor:pointer; user-select:none; margin-top:12px; display:inline-block}
+  #preview{margin-top:12px; font-size:.8rem; max-height:300px; overflow:auto; border:1px solid var(--line); border-radius:9px}
+  #preview table{border-collapse:collapse; width:100%}
+  #preview th,#preview td{border:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top}
+  #preview th{background:var(--soft); position:sticky; top:0}
+  .g-txt{color:var(--green)} .r-txt{color:var(--red)}
+  .filechip{margin-top:10px; font-size:.85rem; color:var(--ink); display:none}
+  .filechip.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Script → PPD Converter</h1>
+  <p class="sub">Drop a color-coded Script (.docx) and download a finished PPD table. Your text is never altered.</p>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="step-head"><span class="step-num">1</span>Course info <span style="font-weight:400;color:var(--muted);margin-left:6px;font-size:.85rem">(goes in Videos column)</span></div>
+    <div class="row2">
+      <div class="field">
+        <label for="course">Course code</label>
+        <input type="text" id="course" placeholder="e.g. ABC123_S1" value="">
+      </div>
+      <div class="field" style="max-width:140px">
+        <label for="week">Week #</label>
+        <input type="text" id="week" placeholder="e.g. 1" value="">
+      </div>
+    </div>
+    <div class="hint">Result label: <strong><span id="vidlabel">(enter a course code)</span></strong>. The tool tries to auto-fill the course code and week from your script &mdash; edit if needed.</div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="step-head"><span class="step-num">2</span>Where should GREEN text go?</div>
+    <label class="opt">
+      <input type="radio" name="green" value="both" checked>
+      <span><span class="t">Graphics + keep in Script</span><span class="d">Green stays in the Script column AND is copied to Graphics. Matches your manual Week 1.</span></span>
+    </label>
+    <label class="opt">
+      <input type="radio" name="green" value="graphics">
+      <span><span class="t">Graphics only (remove from Script)</span><span class="d">Green moves out of the Script column entirely. Matches the written color code.</span></span>
+    </label>
+    <div class="hint" style="margin-top:4px">
+      In Graphics, green is prefixed <span class="g-txt"><strong>Prof.'s Graphic Notes:</strong></span> and red is prefixed <span class="r-txt"><strong>Prof.'s Production Notes:</strong></span> — colors preserved. Red always stays only in Graphics.
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card">
+    <div class="step-head"><span class="step-num">3</span>Upload Script</div>
+    <div id="drop">
+      <strong>Click to choose</strong> or drag a <strong>.docx</strong> here
+      <input type="file" id="file" accept=".docx" hidden>
+    </div>
+    <div class="filechip" id="filechip"></div>
+    <div class="preview-tog" id="ptog" style="display:none">▸ Show parsed preview</div>
+    <div id="preview" style="display:none"></div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="card">
+    <div class="step-head"><span class="step-num">4</span>Generate PPD</div>
+    <button class="btn" id="go" disabled>Convert &amp; Download .docx</button>
+    <div class="status" id="status"></div>
+    <div class="hint">Header rows (Team / ID / VP…) are left blank for you to fill after download.</div>
+  </div>
+</div>
+
+<!-- Libraries from CDN: JSZip reads the .docx, docx.js writes the new one -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script>
+// Fallback: if the primary docx CDN failed, load an alternate before anything runs.
+(function(){
+  if(!(window.docx && window.docx.Document)){
+    document.write('<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/script>');
+  }
+})();
+</script>
+<script>
+/* ---------- color classification ---------- */
+// Word stores run color as hex in <w:color w:val="RRGGBB"/>. We bucket into black/green/red.
+function classify(hex){
+  if(!hex || hex==='auto') return 'black';
+  hex = hex.toUpperCase();
+  const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+  if(isNaN(r)) return 'black';
+  // Blue (PlayPosit): blue channel dominant. Check FIRST — cyan-blue (e.g. 0F9ED5) also has a high green channel.
+  if(b > r+30 && b > 110 && r < 160) return 'blue';
+  // Green: green channel clearly dominant
+  if(g > r+25 && g > b+25 && g > 80) return 'green';
+  // Red: red channel clearly dominant
+  if(r > g+40 && r > b+40 && r > 100) return 'red';
+  return 'black';
+}
+
+/* ---------- parse .docx ---------- */
+async function parseDocx(arrayBuffer){
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  const xmlText = await zip.file('word/document.xml').async('string');
+  const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+  // --- read numbering definitions (numId -> level0 format) so we can reproduce auto-list markers ---
+  let numFmt = {}; // numId -> {fmt, text}
+  try{
+    const numFile = zip.file('word/numbering.xml');
+    if(numFile){
+      const numXml = new DOMParser().parseFromString(await numFile.async('string'),'application/xml');
+      // numId -> abstractNumId
+      const n2a = {};
+      for(const n of numXml.getElementsByTagNameNS(W,'num')){
+        const nid = n.getAttribute('w:numId') || n.getAttributeNS(W,'numId');
+        const a = n.getElementsByTagNameNS(W,'abstractNumId')[0];
+        if(a) n2a[nid] = a.getAttribute('w:val') || a.getAttributeNS(W,'val');
+      }
+      // abstractNumId -> level0 fmt/text
+      const a2f = {};
+      for(const an of numXml.getElementsByTagNameNS(W,'abstractNum')){
+        const aid = an.getAttribute('w:abstractNumId') || an.getAttributeNS(W,'abstractNumId');
+        for(const lvl of an.getElementsByTagNameNS(W,'lvl')){
+          const il = lvl.getAttribute('w:ilvl') || lvl.getAttributeNS(W,'ilvl');
+          if(il==='0'){
+            const f = lvl.getElementsByTagNameNS(W,'numFmt')[0];
+            const t = lvl.getElementsByTagNameNS(W,'lvlText')[0];
+            a2f[aid] = {fmt:(f?(f.getAttribute('w:val')||f.getAttributeNS(W,'val')):'decimal'),
+                        text:(t?(t.getAttribute('w:val')||t.getAttributeNS(W,'val')):'%1.')};
+            break;
+          }
+        }
+      }
+      for(const nid in n2a) numFmt[nid] = a2f[n2a[nid]] || {fmt:'decimal',text:'%1.'};
+    }
+  }catch(e){ /* no numbering — fine */ }
+
+  function marker(def, n){
+    const fmt = def.fmt, text = def.text || '%1.';
+    if(fmt==='bullet'){
+      // lvlText holds a symbol-font glyph; map common Wingdings/Symbol codepoints to real bullets
+      const g = text;
+      if(g==='\uF0B7' || g==='\u00B7') return '\u2022';      // ● solid bullet
+      if(g==='o' || g==='\uF06F') return '\u25CB';            // ○ hollow bullet
+      if(g==='\uF0A7' || g==='\u00A7') return '\u25AA';       // ▪ square
+      if(g==='\u2013' || g==='-') return '\u2013';            // – dash
+      return '\u2022'; // default solid bullet
+    }
+    let sym;
+    if(fmt==='lowerLetter') sym = String.fromCharCode(96+n);
+    else if(fmt==='upperLetter') sym = String.fromCharCode(64+n);
+    else if(fmt==='lowerRoman' || fmt==='upperRoman'){
+      const map=[[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']]; let s='',x=n;
+      for(const [v,symb] of map){ while(x>=v){s+=symb;x-=v;} }
+      sym = fmt==='upperRoman'?s.toUpperCase():s;
+    } else sym = String(n);
+    return text.replace(/%\d+/, sym);
+  }
+
+  const counters = {}; // numId -> current count
+  const paras = [...xml.getElementsByTagNameNS(W,'p')];
+  const out = [];
+
+  for(const p of paras){
+    // detect list membership
+    let listMarker = null, align = null;
+    const pPr = p.getElementsByTagNameNS(W,'pPr')[0];
+    if(pPr){
+      const jc = pPr.getElementsByTagNameNS(W,'jc')[0];
+      if(jc) align = jc.getAttribute('w:val') || jc.getAttributeNS(W,'val'); // center / both / right / left
+      const numPr = pPr.getElementsByTagNameNS(W,'numPr')[0];
+      if(numPr){
+        const ni = numPr.getElementsByTagNameNS(W,'numId')[0];
+        const numId = ni ? (ni.getAttribute('w:val')||ni.getAttributeNS(W,'val')) : null;
+        if(numId){
+          counters[numId] = (counters[numId]||0) + 1;
+          const def = numFmt[numId] || {fmt:'decimal',text:'%1.'};
+          listMarker = marker(def, counters[numId]);
+        }
+      }
+    }
+    // gather runs with text + color + formatting, in document order
+    const runs = [];
+    for(const r of p.getElementsByTagNameNS(W,'r')){
+      let color = null, highlight = null, bold=false, italic=false, underline=false, font=null, size=null,
+          strike=false, vertAlign=null, underlineStyle=null;
+      const rPr = r.getElementsByTagNameNS(W,'rPr')[0];
+      if(rPr){
+        const c = rPr.getElementsByTagNameNS(W,'color')[0];
+        if(c) color = c.getAttribute('w:val') || c.getAttributeNS(W,'val');
+        const h = rPr.getElementsByTagNameNS(W,'highlight')[0];
+        if(h) highlight = h.getAttribute('w:val') || h.getAttributeNS(W,'val');
+        const bEl = rPr.getElementsByTagNameNS(W,'b')[0];
+        if(bEl){ const v=bEl.getAttribute('w:val')||bEl.getAttributeNS(W,'val'); bold = !(v==='0'||v==='false'); }
+        const iEl = rPr.getElementsByTagNameNS(W,'i')[0];
+        if(iEl){ const v=iEl.getAttribute('w:val')||iEl.getAttributeNS(W,'val'); italic = !(v==='0'||v==='false'); }
+        const uEl = rPr.getElementsByTagNameNS(W,'u')[0];
+        if(uEl){ const v=uEl.getAttribute('w:val')||uEl.getAttributeNS(W,'val'); underline = !(v==='none'||v==='0'); underlineStyle = v||'single'; }
+        // strikethrough (single or double)
+        const sEl = rPr.getElementsByTagNameNS(W,'strike')[0];
+        if(sEl){ const v=sEl.getAttribute('w:val')||sEl.getAttributeNS(W,'val'); strike = !(v==='0'||v==='false'); }
+        const dsEl = rPr.getElementsByTagNameNS(W,'dstrike')[0];
+        if(dsEl){ const v=dsEl.getAttribute('w:val')||dsEl.getAttributeNS(W,'val'); if(!(v==='0'||v==='false')) strike='double'; }
+        // superscript / subscript
+        const vaEl = rPr.getElementsByTagNameNS(W,'vertAlign')[0];
+        if(vaEl){ vertAlign = vaEl.getAttribute('w:val')||vaEl.getAttributeNS(W,'val'); }
+        const rf = rPr.getElementsByTagNameNS(W,'rFonts')[0];
+        if(rf) font = rf.getAttribute('w:ascii')||rf.getAttributeNS(W,'ascii')||rf.getAttribute('w:hAnsi')||rf.getAttributeNS(W,'hAnsi');
+        const sz = rPr.getElementsByTagNameNS(W,'sz')[0];
+        if(sz){ const v=sz.getAttribute('w:val')||sz.getAttributeNS(W,'val'); if(v) size=parseInt(v,10); }
+      }
+      let txt = '';
+      // walk children in order so a leading <w:tab/> stays before the text
+      for(const child of r.childNodes){
+        if(child.nodeType!==1) continue;
+        const ln = child.localName;
+        if(ln==='t') txt += child.textContent;
+        else if(ln==='tab') txt += '\t';
+        else if(ln==='br' || ln==='cr') txt += '\n';
+      }
+      if(txt.length) runs.push({txt, cls: classify(color), highlight, bold, italic, underline, underlineStyle, font, size, strike, vertAlign});
+    }
+    // FIX #2: when an "Exercise #...:" header is immediately followed by a tab, replace ONLY that tab
+    // with a space. The tab is often the start of the NEXT run, so handle across run boundaries.
+    {
+      const joined = runs.map(x=>x.txt).join('');
+      const m = joined.match(/^(\s*Exercise\s*#[^:]*:)\t/);
+      if(m){
+        // walk runs, find the tab at character index m[1].length and turn it into a space
+        let idx = 0; const target = m[1].length;
+        for(const rr of runs){
+          for(let k=0;k<rr.txt.length;k++){
+            if(idx===target && rr.txt[k]==='\t'){
+              rr.txt = rr.txt.slice(0,k) + ' ' + rr.txt.slice(k+1);
+            }
+            idx++;
+          }
+        }
+      }
+    }
+    const full = runs.map(x=>x.txt).join('');
+    if(!full.trim()) { out.push({full:'', runs:[], blank:true, listMarker:null, align:null}); continue; }
+    out.push({full, runs, blank:false, listMarker, align});
+  }
+  return out;
+}
+
+/* ---------- build segments by color from runs ---------- */
+// Each segment = a run of same-class adjacent runs. Keeps the individual formatted
+// runs inside `.runs` so bold/italic/underline/font survive. `.txt` is the concatenation.
+function segmentsByColor(runs){
+  const segs = [];
+  for(const r of runs){
+    const prev = segs[segs.length-1];
+    if(prev && prev.cls===r.cls){
+      prev.txt += r.txt;
+      prev.runs.push(r);
+      if(r.highlight) prev.highlight = r.highlight; // remember any highlight in the segment
+    } else {
+      segs.push({cls:r.cls, txt:r.txt, highlight:r.highlight||null, runs:[r]});
+    }
+  }
+  return segs;
+}
+
+/* ---------- detect headers ---------- */
+function headerKind(text){
+  const t = text.trim();
+  if(/^module\s*#?\s*\d+/i.test(t)) return 'module';
+  if(/^week\s*#?\s*\d+/i.test(t)) return 'week';
+  return null;
+}
+function weekNumFrom(text){
+  const m = text.match(/week\s*#?\s*(\d+)/i); return m ? m[1] : null;
+}
+function moduleNumFrom(text){
+  const m = text.match(/module\s*#?\s*(\d+)/i); return m ? m[1] : null;
+}
+
+/* ---------- assemble row model ---------- */
+function buildRows(paras, greenMode){
+  const rows = [];
+  let started = false;
+  let blueBuffer = [];
+  let greenBuffer = [];
+
+  function isAllOf(para, cls){
+    const segs = segmentsByColor(para.runs);
+    return segs.length>0 && segs.every(s=>s.cls===cls);
+  }
+  function fixExerciseTab(txt){
+    return txt.replace(/^(\s*Exercise\s*#[^:]*:)\t/, '$1 ');
+  }
+  // turn a paragraph's same-color segments into line-segments, prepending the list marker (in color)
+  function paraSegs(para, cls){
+    const segs = segmentsByColor(para.runs).filter(s=>s.cls===cls);
+    const marker = para.listMarker ? para.listMarker + '\t' : '';
+    return segs.map((s,j)=>({
+      cls, txt:(j===0?marker:'')+s.txt, runs:s.runs, highlight:s.highlight,
+      lineStart:(j===0), align:para.align||null,
+      // marker is its own colored run prefix (not part of source runs)
+      markerText:(j===0?marker:'')
+    }));
+  }
+  function flushBlue(){
+    if(!blueBuffer.length) return;
+    const ppSegs = [];
+    blueBuffer.forEach((para)=>{
+      paraSegs(para,'blue').forEach(seg=>{ seg.txt = fixExerciseTab(seg.txt); ppSegs.push(seg); });
+    });
+    rows.push({type:'data', video:'', script:[], graphics:[], playposit:ppSegs});
+    blueBuffer = [];
+  }
+  function flushGreen(){
+    if(!greenBuffer.length) return;
+    const gSegs = [];
+    greenBuffer.forEach((para)=> paraSegs(para,'green').forEach(seg=> gSegs.push(seg)));
+    const scriptSegs = (greenMode==='both')
+      ? gSegs.map(s=>({cls:'green', txt:s.txt, runs:s.runs, lineStart:s.lineStart, align:s.align, markerText:s.markerText}))
+      : [];
+    rows.push({type:'data', video:'', script:scriptSegs, graphics:gSegs, playposit:[]});
+    greenBuffer = [];
+  }
+  function flushAll(){ flushBlue(); flushGreen(); }
+
+  for(const para of paras){
+    if(para.blank) continue;
+    const kind = headerKind(para.full);
+
+    if(kind==='week'){
+      const wn = weekNumFrom(para.full);
+      if(wn){ document.getElementById('week').value = wn; }
+      continue;
+    }
+    if(kind==='module'){
+      flushAll();
+      started = true;
+      const mn = moduleNumFrom(para.full);
+      rows.push({type:'module', video:[{cls:'black', txt:'Module '+(mn||''), runs:[{txt:'Module '+(mn||''),bold:true}], lineStart:true}],
+                 script:[{cls:'black', txt:para.full, runs:para.runs, lineStart:true}], graphics:[], playposit:[]});
+      continue;
+    }
+    if(!started){
+      if(/^(black|green|red|blue)\s+text\s*[–-]/i.test(para.full.trim())) continue;
+      if(/^code:/i.test(para.full.trim())) continue;
+      if(/rebuild scripts/i.test(para.full)) continue;
+    }
+
+    if(isAllOf(para,'blue')){ flushGreen(); blueBuffer.push(para); continue; }
+    if(isAllOf(para,'green')){ flushBlue(); greenBuffer.push(para); continue; }
+    flushAll();
+
+    // DATA paragraph (mixed/black): split into colored segments, preserve formatting + marker + align
+    const segs = segmentsByColor(para.runs);
+    const scriptSegs = [];
+    const graphicSegs = [];
+    const ppSegs = [];
+    const videoSegs = [];
+    const marker = para.listMarker ? para.listMarker + '\t' : '';
+    let firstScriptSeen = false;
+
+    segs.forEach((s)=>{
+      const common = {runs:s.runs, align:para.align||null};
+      if(s.cls==='green'){
+        graphicSegs.push({cls:'green', txt:s.txt, lineStart:(graphicSegs.length===0), ...common});
+        if(greenMode==='both') scriptSegs.push({cls:'green', txt:s.txt, lineStart:false, ...common});
+      } else if(s.cls==='red'){
+        // RULE 3: red production notes go to VIDEO column, keep the prefix
+        videoSegs.push({cls:'red', txt:s.txt, prefix:"Prof.'s Production Notes: ", lineStart:(videoSegs.length===0), ...common});
+      } else if(s.cls==='blue'){
+        ppSegs.push({cls:'blue', txt:fixExerciseTab(s.txt), highlight:s.highlight, lineStart:(ppSegs.length===0), ...common});
+      } else {
+        // black: first black seg of the paragraph carries the list marker
+        const mk = (!firstScriptSeen && marker) ? marker : '';
+        scriptSegs.push({cls:'black', txt:mk+s.txt, markerText:mk, lineStart:(scriptSegs.length===0), ...common});
+        firstScriptSeen = true;
+      }
+    });
+    rows.push({type:'data', video:videoSegs, script:scriptSegs, graphics:graphicSegs, playposit:ppSegs});
+  }
+  flushAll();
+  return rows;
+}
+
+/* ---------- render preview ---------- */
+function fmtRun(r, color, stripHL){
+  let t = esc(r.txt||'');
+  if(r.bold) t = `<b>${t}</b>`;
+  if(r.italic) t = `<i>${t}</i>`;
+  if(r.underline) t = `<u>${t}</u>`;
+  if(r.strike) t = `<s>${t}</s>`;
+  if(r.vertAlign==='superscript') t = `<sup>${t}</sup>`;
+  else if(r.vertAlign==='subscript') t = `<sub>${t}</sub>`;
+  const hl = (r.highlight==='yellow' && !stripHL) ? ';background:#fff3a3' : '';
+  return `<span style="color:${color}${hl}">${t}</span>`;
+}
+function segsToHtml(segs, withPrefix, stripHL){
+  if(!segs || !segs.length) return '';
+  let html=''; let open=false;
+  segs.forEach((s,i)=>{
+    const color = s.cls==='green'?'#2E7D32':(s.cls==='red'?'#C00000':(s.cls==='blue'?'#0F9ED5':'#1f2328'));
+    const startNew = (s.lineStart===true)||i===0;
+    if(startNew){
+      if(open) html+='</div>';
+      const al = s.align==='center'?'center':(s.align==='right'?'right':(s.align==='both'?'justify':'left'));
+      html+=`<div style="text-align:${al}">`; open=true;
+      if(s.markerText) html+=`<span style="color:${color}">${esc(s.markerText).replace(/\t/g,' ')}</span>`;
+      if(withPrefix&&s.prefix) html+=`<span style="color:${color}">${esc(s.prefix)}</span>`;
+    }
+    const srcRuns=(s.runs&&s.runs.length)?s.runs:[{txt:(s.txt||'')}];
+    srcRuns.forEach(r=> html+=fmtRun({...r, txt:(r.txt||'').replace(/\t/g,'  ')},color,stripHL));
+  });
+  if(open) html+='</div>';
+  return html;
+}
+function renderPreview(rows){
+  let html = '<table><tr><th>Videos</th><th>Graphics</th><th>Script</th><th>PlayPosit</th></tr>';
+  for(const row of rows){
+    const v = segsToHtml(Array.isArray(row.video)?row.video:[], true);
+    const g = segsToHtml(row.graphics, false);
+    const sc = segsToHtml(row.script, false, true); // strip highlight in Script preview too
+    const pp = segsToHtml(row.playposit||[], false);
+    const vstyle = row.type==='module' ? ' style="font-weight:700"' : '';
+    html += `<tr><td${vstyle}>${v}</td><td>${g}</td><td>${sc}</td><td>${pp}</td></tr>`;
+  }
+  html += '</table>';
+  return html;
+}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---------- build .docx ---------- */
+function getDocxLib(){
+  // The CDN UMD build may attach to window.docx, window.docxjs, or just leak globals.
+  const cand = window.docx || window.docxjs || (typeof Document!=='undefined' && window.Packer ? window : null);
+  if(cand && cand.Document && cand.Packer) return cand;
+  // last resort: scan window for the signature
+  for(const k of Object.keys(window)){
+    const v = window[k];
+    if(v && typeof v==='object' && v.Document && v.Packer && v.Table) return v;
+  }
+  return null;
+}
+
+async function buildDocx(rows, videoLabel){
+  const D = getDocxLib();
+  if(!D) throw new Error('docx library did not load — check your internet connection and reload.');
+  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,BorderStyle,ShadingType,HeadingLevel} = D;
+
+  const border = {style:BorderStyle.SINGLE, size:1, color:'CCCCCC'};
+  const borders = {top:border,bottom:border,left:border,right:border};
+  const colW = [2200, 4400, 6400, 1400]; // sums to 14400 = landscape US Letter content (0.5" margins)
+  const totalW = colW.reduce((a,b)=>a+b,0);
+  const margins = {top:60,bottom:60,left:100,right:100};
+
+  function cell(children, w, shade){
+    return new TableCell({
+      borders, width:{size:w,type:WidthType.DXA}, margins,
+      shading: shade ? {fill:shade, type:ShadingType.CLEAR} : undefined,
+      children
+    });
+  }
+  // Map Word underline style to docx UnderlineType
+  function underlineOpt(style){
+    const U = D.UnderlineType || {};
+    const map = { single:U.SINGLE, double:U.DOUBLE, thick:U.THICK, dotted:U.DOTTED,
+                  dash:U.DASH, wave:U.WAVE, wavyHeavy:U.WAVYHEAVY, dashLong:U.DASHLONG,
+                  dotDash:U.DOTDASH, dotDotDash:U.DOTDOTDASH, words:U.WORDS };
+    const t = map[style] || U.SINGLE;
+    return t ? {type:t} : {};
+  }
+  // Convert one source run into one or more TextRuns, splitting on tabs so docx renders real tabs.
+  // Color comes from the segment class (PPD palette); formatting carries from the source run.
+  // stripHL=true removes yellow highlight (used for the Script column).
+  function textRunsFromRun(r, classColor, prefixText, stripHL){
+    const {Tab} = D;
+    const pieces = [];
+    let text = (prefixText||'') + (r.txt||'');
+    const parts = text.split('\t');
+    parts.forEach((part, idx)=>{
+      if(idx>0) pieces.push(new TextRun({children:[new Tab()]}));
+      if(part.length){
+        const opt = {text:part, color:classColor};
+        if(r.bold) opt.bold = true;
+        if(r.italic) opt.italics = true;
+        if(r.underline) opt.underline = underlineOpt(r.underlineStyle);
+        if(r.strike==='double') opt.doubleStrike = true;
+        else if(r.strike) opt.strike = true;
+        if(r.vertAlign==='superscript') opt.superScript = true;
+        else if(r.vertAlign==='subscript') opt.subScript = true;
+        if(r.font) opt.font = r.font;
+        if(r.size) opt.size = r.size; // half-points
+        if(r.highlight && !stripHL) opt.highlight = r.highlight; // RULE 2: strip in Script column
+        pieces.push(new TextRun(opt));
+      }
+    });
+    return pieces;
+  }
+
+  function colorFor(cls){
+    return cls==='green' ? '2E7D32' : (cls==='red' ? 'C00000' : (cls==='blue' ? '0F9ED5' : '000000'));
+  }
+
+  function alignFor(a){
+    if(a==='center') return D.AlignmentType.CENTER;
+    if(a==='right') return D.AlignmentType.RIGHT;
+    if(a==='both') return D.AlignmentType.JUSTIFIED;
+    return undefined;
+  }
+
+  // Build paragraphs from segments. stripHL strips yellow highlight (Script column only).
+  function runsFromSegs(segs, withPrefix, stripHL){
+    if(!segs.length) return [new Paragraph({children:[new TextRun('')]})];
+    const out = [];
+    let current = null;
+    segs.forEach((s, i)=>{
+      const classColor = colorFor(s.cls);
+      const startNew = (s.lineStart===true) || i===0;
+      if(startNew){ current = {children:[], align:alignFor(s.align)}; out.push(current); }
+      if(s.markerText){
+        textRunsFromRun({txt:s.markerText}, classColor, '', stripHL).forEach(tr=>current.children.push(tr));
+      }
+      const srcRuns = (s.runs && s.runs.length) ? s.runs : [{txt:(s.txt||'').replace(s.markerText||'','')}];
+      srcRuns.forEach((r, ri)=>{
+        const prefix = (withPrefix && s.prefix && ri===0) ? s.prefix : '';
+        textRunsFromRun(r, classColor, prefix, stripHL).forEach(tr=>current.children.push(tr));
+      });
+    });
+    return out.map(o => new Paragraph({children: o.children.length?o.children:[new TextRun('')], alignment:o.align}));
+  }
+
+  const headerRow = new TableRow({children:[
+    cell([new Paragraph({children:[new TextRun({text:'Videos',bold:true})]})], colW[0], 'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})], colW[1], 'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})], colW[2], 'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})], colW[3], 'E8E6DF'),
+  ]});
+
+  // blank metadata row + week label row, like the example
+  const metaRow = new TableRow({children:[
+    cell([new Paragraph('')], colW[0]),
+    cell([new Paragraph({children:[new TextRun({text:'Team:    ID:    VP:    VE:    MMD:',color:'808080'})]})], colW[1]),
+    cell([new Paragraph('')], colW[2]),
+    cell([new Paragraph('')], colW[3]),
+  ]});
+  const weekRow = new TableRow({children:[
+    cell([new Paragraph({children:[new TextRun({text:videoLabel,bold:true})]})], colW[0]),
+    cell([new Paragraph('')], colW[1]),
+    cell([new Paragraph('')], colW[2]),
+    cell([new Paragraph('')], colW[3]),
+  ]});
+
+  const bodyRows = rows.map(row=>{
+    const isModule = row.type==='module';
+    const shade = isModule?'F4F2EC':undefined;
+    const videoSegs = Array.isArray(row.video) ? row.video : [];
+    return new TableRow({children:[
+      cell(runsFromSegs(videoSegs, true), colW[0], shade),     // Video: module label OR red production notes (with prefix)
+      cell(runsFromSegs(row.graphics, false), colW[1], shade), // Graphics: green, NO prefix, keep highlight
+      cell(runsFromSegs(row.script, false, true), colW[2], shade),   // Script: STRIP yellow highlight
+      cell(runsFromSegs(row.playposit||[], false), colW[3], shade), // PlayPosit: blue, keep highlight
+    ]});
+  });
+
+  const table = new Table({
+    width:{size:totalW,type:WidthType.DXA},
+    columnWidths:colW,
+    rows:[headerRow, metaRow, weekRow, ...bodyRows]
+  });
+
+  const doc = new Document({
+    styles:{default:{document:{run:{font:'Arial',size:20}}}},
+    sections:[{
+      properties:{page:{size:{width:12240,height:15840,orientation:D.PageOrientation.LANDSCAPE},margin:{top:720,right:720,bottom:720,left:720}}},
+      children:[
+        new Paragraph({children:[new TextRun({text:videoLabel+' — PPD',bold:true,size:28})]}),
+        new Paragraph({children:[new TextRun({text:'Generated from script. Text unchanged.',color:'808080',size:18})]}),
+        new Paragraph(''),
+        table
+      ]
+    }]
+  });
+  return await Packer.toBlob(doc);
+}
+
+/* ---------- wiring ---------- */
+const fileInput = document.getElementById('file');
+const drop = document.getElementById('drop');
+const goBtn = document.getElementById('go');
+const statusEl = document.getElementById('status');
+const filechip = document.getElementById('filechip');
+const ptog = document.getElementById('ptog');
+const previewEl = document.getElementById('preview');
+let parsedParas = null;
+let currentFileName = '';
+
+function updateLabel(){
+  const c = document.getElementById('course').value.trim() || 'COURSE';
+  const w = document.getElementById('week').value.trim() || '?';
+  document.getElementById('vidlabel').textContent = `${c}_Wk${w}`;
+  return `${c}_Wk${w}`;
+}
+
+// Try to detect a course code and week number from the script's own text.
+// Only fills a field if the user hasn't already typed something there.
+function autoFillFromScript(paras){
+  const courseEl = document.getElementById('course');
+  const weekEl = document.getElementById('week');
+  // scan the first ~15 non-blank paragraphs (header/legend region)
+  const head = paras.filter(p=>!p.blank).slice(0,15).map(p=>p.full);
+
+  // WEEK: "Week #12", "WEEK 3", etc.
+  if(!weekEl.value.trim()){
+    for(const t of head){
+      const m = t.match(/week\s*#?\s*(\d+)/i);
+      if(m){ weekEl.value = m[1]; break; }
+    }
+  }
+
+  // COURSE CODE: look for a line like "Law 609.JDi. LCR 1 2025 ..." or "ABC 123 ... LCR 2"
+  // Build a compact code from course-number + section if present. Generic, not tied to any school.
+  if(!courseEl.value.trim()){
+    let code = '';
+    for(const t of head){
+      // pattern: letters + number (course), optionally a section token like "LCR 1" / "Sec 2"
+      const cm = t.match(/\b([A-Za-z]{2,6})\s*[-_ ]?\s*(\d{2,4}[A-Za-z]?)\b/);
+      if(cm){
+        code = (cm[1] + cm[2]).toUpperCase();
+        const sec = t.match(/\b(?:LCR|SEC|SECTION|LEC)\s*[-_ ]?\s*(\d+)\b/i);
+        if(sec) code += '_LCR' + sec[1];
+        break;
+      }
+    }
+    if(code) courseEl.value = code;
+  }
+}
+
+document.getElementById('course').addEventListener('input',updateLabel);
+document.getElementById('week').addEventListener('input',updateLabel);
+
+drop.addEventListener('click',()=>fileInput.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('hot')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('hot'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('hot');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])});
+
+function setStatus(msg,type){statusEl.className='status '+type; statusEl.textContent=msg;}
+
+async function handleFile(f){
+  if(!f.name.toLowerCase().endsWith('.docx')){setStatus('Please choose a .docx file.','err');return;}
+  currentFileName = f.name.replace(/\.docx$/i,'');
+  filechip.textContent='📄 '+f.name; filechip.classList.add('show');
+  setStatus('Parsing…','info');
+  try{
+    const buf = await f.arrayBuffer();
+    parsedParas = await parseDocx(buf);
+    autoFillFromScript(parsedParas); // detect course code + week (only if fields are empty)
+    updateLabel();
+    goBtn.disabled=false;
+    const greenMode = document.querySelector('input[name=green]:checked').value;
+    const rows = buildRows(parsedParas, greenMode);
+    previewEl.innerHTML = renderPreview(rows);
+    ptog.style.display='inline-block';
+    const dataCount = rows.filter(r=>r.type==='data').length;
+    const modCount = rows.filter(r=>r.type==='module').length;
+    setStatus(`Parsed: ${modCount} module(s), ${dataCount} script paragraph(s). Ready to convert.`,'ok');
+  }catch(err){
+    console.error(err);
+    setStatus('Could not read this file: '+err.message,'err');
+    goBtn.disabled=true;
+  }
+}
+
+ptog.addEventListener('click',()=>{
+  const open = previewEl.style.display!=='none';
+  previewEl.style.display = open?'none':'block';
+  ptog.textContent = (open?'▸ Show':'▾ Hide')+' parsed preview';
+});
+
+// re-render preview when green mode changes
+document.querySelectorAll('input[name=green]').forEach(r=>r.addEventListener('change',()=>{
+  if(parsedParas){
+    const greenMode = document.querySelector('input[name=green]:checked').value;
+    previewEl.innerHTML = renderPreview(buildRows(parsedParas, greenMode));
+  }
+}));
+
+goBtn.addEventListener('click',async()=>{
+  if(!parsedParas) return;
+  goBtn.disabled=true;
+  setStatus('Building .docx…','info');
+  try{
+    const greenMode = document.querySelector('input[name=green]:checked').value;
+    const rows = buildRows(parsedParas, greenMode);
+    const label = updateLabel();
+    const blob = await buildDocx(rows, label);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `PPD_${label}.docx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setStatus('Done — downloaded PPD_'+label+'.docx','ok');
+  }catch(err){
+    console.error(err);
+    setStatus('Build failed: '+err.message,'err');
+  }
+  goBtn.disabled=false;
+});
+
+updateLabel();
+</script>
+</body>
+</html>
