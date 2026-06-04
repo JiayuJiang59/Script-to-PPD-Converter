@@ -76,6 +76,13 @@ any static server.
 This tool does not upload, store, or transmit your files. All parsing and
 document generation happen locally in your browser.
 
+## How this was built
+
+Developed collaboratively with Claude Opus 4.8 (Anthropic). The design
+decisions, color-code conventions, and formatting rules were directed by the
+author; Claude was used to write and iterate on the code. All output was
+reviewed and validated before release.
+
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE).
