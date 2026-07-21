@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPTX → PPD Converter</title>
+<style>
+  :root{
+    --bg:#faf9f6; --card:#ffffff; --ink:#1f2328; --muted:#6a737d;
+    --line:#e3e1da; --accent:#d97426; --accent-d:#b45c17;
+    --soft:#f6f1ea; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;padding:24px 16px 80px;}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:1.45rem;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.92rem;margin:0 0 22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+  .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:.8rem;font-weight:700;margin-right:8px;flex:0 0 auto}
+  .step-head{display:flex;align-items:center;font-weight:650;margin-bottom:12px;font-size:1.02rem}
+  .setting{border-top:1px solid var(--line);padding:16px 0 4px}
+  .setting:first-of-type{border-top:none;padding-top:0}
+  .setting h4{margin:0 0 4px;font-size:.98rem}
+  .setting .instr{color:var(--muted);font-size:.82rem;margin:0 0 10px}
+  label.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);
+    border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s;background:var(--card)}
+  label.opt:hover{border-color:var(--accent);background:var(--soft)}
+  label.opt input{margin-top:3px;flex:0 0 auto}
+  .chk{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:.85rem;background:var(--card)}
+  .chk:hover{border-color:var(--accent)}
+  .chk input{margin:0}
+  .opt .t{font-weight:600;font-size:.92rem}
+  .opt .d{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .field label{font-size:.85rem;font-weight:600}
+  .field input[type=text],select{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:.95rem;background:#fff}
+  .row2{display:flex;gap:12px}.row2 .field{flex:1}
+  #drop{border:2px dashed var(--line);border-radius:12px;padding:34px 16px;text-align:center;color:var(--muted);
+    cursor:pointer;transition:.15s;background:var(--soft)}
+  #drop.hot{border-color:var(--accent);background:#fbeee2;color:var(--accent-d)}
+  #drop strong{color:var(--ink)}
+  .btn{background:var(--accent);color:#fff;border:none;padding:13px 22px;border-radius:11px;font-size:1rem;
+    font-weight:650;cursor:pointer;width:100%;transition:.15s}
+  .btn:hover{background:var(--accent-d)}.btn:disabled{background:#c9cdd2;cursor:not-allowed}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:10px}
+  .status{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.9rem;display:none}
+  .status.ok{display:block;background:#eaf5ea;color:#205a23;border:1px solid #bfe0bf}
+  .status.err{display:block;background:#fbeaea;color:#9c2020;border:1px solid #e6bcbc}
+  .status.info{display:block;background:#fbeee2;color:var(--accent-d);border:1px solid #f0d3b4}
+  .hidden{display:none}
+  #preview{margin-top:12px;font-size:.78rem;max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:9px}
+  #preview table{border-collapse:collapse;width:100%}
+  #preview th,#preview td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+  #preview th{background:var(--soft);position:sticky;top:0}
+  #preview td.notes{white-space:pre-wrap}
+  .dash{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:10px}
+  .dash .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .dash .stat{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .dash .stat .n{font-size:1.35rem;font-weight:700}
+  .dash .stat .l{font-size:.76rem;color:var(--muted)}
+  .mini{font-size:.8rem;color:var(--muted)}
+  .pill{display:inline-block;font-size:.7rem;padding:1px 7px;border-radius:20px;background:var(--soft);color:var(--muted);margin-left:6px}
+  .warn{color:#b45c17;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>PPTX → PPD Converter</h1>
+  <p class="sub">Upload a PowerPoint (.pptx). It reads every slide and its speaker notes, auto-detects the course &amp; week, previews a PPD table (one row per slide), and downloads a finished Word .docx. Your text is never altered, and files never leave your device.</p>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="card">
+    <div class="step-head"><span class="step-num">1</span>Upload your presentation</div>
+    <div id="drop"><strong>Click to choose</strong> or drag a <strong>.pptx</strong> here
+      <input type="file" id="file" accept=".pptx" hidden></div>
+    <div class="hint" id="filechip"></div>
+  </div>
+
+  <!-- STEP 2: COURSE INFO -->
+  <div class="card hidden" id="courseCard">
+    <div class="step-head"><span class="step-num">2</span>Course &amp; week
+      <span class="pill" id="detectPill">auto-detected</span></div>
+    <div class="row2">
+      <div class="field"><label for="course">Course code</label>
+        <input type="text" id="course" placeholder="e.g. PPM301" value=""></div>
+      <div class="field" style="max-width:150px"><label for="week">Week #</label>
+        <input type="text" id="week" placeholder="e.g. 1" value=""></div>
+    </div>
+    <div class="hint">Video label: <strong><span id="vidlabel">…</span></strong>. Edit either field if the detection isn't right.</div>
+  </div>
+
+  <!-- STEP 3: SETTINGS -->
+  <div class="card hidden" id="settingsCard">
+    <div class="step-head"><span class="step-num">3</span>PPD settings</div>
+
+    <div class="setting">
+      <h4>Font in PPD</h4>
+      <p class="instr">Choose how text is rendered in the output document.</p>
+      <label class="opt"><input type="radio" name="font" value="keep" checked>
+        <span><span class="t">Keep the presentation's font</span><span class="d">Uses the deck's dominant font as the document default.</span></span></label>
+      <label class="opt"><input type="radio" name="font" value="convert">
+        <span><span class="t">Convert everything to one font</span><span class="d">Pick a single font for the whole PPD.</span></span></label>
+      <div class="field" id="fontPick" style="opacity:.5;max-width:260px;margin-top:6px">
+        <label for="fontChoice">Font</label>
+        <select id="fontChoice">
+          <option>Arial</option><option>Times New Roman</option><option>Aptos</option>
+          <option>Calibri</option><option>Georgia</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting">
+      <h4>Notes formatting</h4>
+      <label class="opt"><input type="checkbox" id="onePerLine">
+        <span><span class="t">One sentence per line</span><span class="d">In the Script (Notes) column only, start each sentence on a new line for easier teleprompter reading.</span></span></label>
+    </div>
+
+    <div class="setting">
+      <h4>RISE content</h4>
+      <p class="instr">If some slides' notes are RISE module content (not video-lecture script), separate them into their own column. RISE words are excluded from the notes count and teleprompter estimate.</p>
+      <label class="opt"><input type="checkbox" id="riseOn">
+        <span><span class="t">Separate RISE into its own column</span><span class="d">Adds a 5th "RISE" column. A slide's notes move there when they contain the trigger word.</span></span></label>
+      <div class="field" id="riseKwWrap" style="opacity:.5;max-width:320px;margin-top:6px">
+        <label for="riseKw">Trigger word</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="text" id="riseKw" value="RISE" placeholder="RISE" style="flex:1">
+          <label class="chk" style="white-space:nowrap"><input type="checkbox" id="riseCase" checked> Case match</label>
+        </div>
+        <div class="mini" style="margin-top:4px">Case match on: <strong>RISE</strong> ≠ <strong>rise</strong>. Turn off to match any capitalization.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: SUMMARY + PREVIEW -->
+  <div class="card hidden" id="summaryCard">
+    <div class="step-head"><span class="step-num">4</span>Summary &amp; preview</div>
+    <div class="dash">
+      <div class="grid">
+        <div class="stat"><div class="n" id="s_slides">0</div><div class="l">slides</div></div>
+        <div class="stat"><div class="n" id="s_words">0</div><div class="l">notes words</div></div>
+        <div class="stat"><div class="n" id="s_time">0</div><div class="l">min @ 130 wpm</div></div>
+      </div>
+      <div class="mini" id="s_flags" style="margin-top:8px"></div>
+    </div>
+    <div style="background:#fbeee2;border:1px solid #f0d3b4;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.82rem;color:var(--accent-d)">
+      <strong>Before you rely on this PPD, please note:</strong>
+      <ol style="margin:6px 0 0;padding-left:20px;line-height:1.55">
+        <li>Some content — <strong>tables, charts, images, SmartArt</strong> — can't be pulled into text. Check each slide against the original PPTX using the <strong>Slide #</strong> column and fill those in by hand.</li>
+        <li>When a slide has several text boxes or shapes, the <strong>order of text in a cell follows the file's reading order</strong>, which isn't always top-to-bottom on the slide. Skim for anything out of sequence.</li>
+      </ol>
+    </div>
+    <div id="preview"></div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="card hidden" id="genCard">
+    <button class="btn" id="go">Generate &amp; download PPD (.docx)</button>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script>
+(function(){ if(!window.docx){
+  document.write('<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/script>'); }})();
+</script>
+<script>
+const $=id=>document.getElementById(id);
+const A='http://schemas.openxmlformats.org/drawingml/2006/main';         // drawingML (a:)
+const P='http://schemas.openxmlformats.org/presentationml/2006/main';    // presentationML (p:)
+const R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+const PKG='http://schemas.openxmlformats.org/package/2006/relationships';
+const WPM=130; // teleprompter pace — change here if needed
+
+let parsedSlides=null, deckFont=null;
+
+/* ---------- list marker generation ---------- */
+// map PowerPoint buChar codes to real glyphs
+function bulletGlyph(ch){
+  const c=(ch||'').charCodeAt(0);
+  if(c===0xF0B7||c===0x00B7||c===0x2022) return '\u2022'; // •
+  if(c===0x006F||c===0xF06F) return '\u25CB';             // ○
+  if(c===0xF0A7||c===0x00A7||c===0xF0A8) return '\u25AA'; // ▪
+  if(c===0x2013||c===0x002D) return '\u2013';             // –
+  if(ch && ch.trim()) return ch;                          // literal char as-is
+  return '\u2022';
+}
+function autoNumMarker(type,n){
+  const roman=x=>{const m=[[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']];let s='';for(const[v,sy]of m){while(x>=v){s+=sy;x-=v;}}return s;};
+  let core;
+  if(/^alphaLc/.test(type)) core=String.fromCharCode(96+((n-1)%26)+1);
+  else if(/^alphaUc/.test(type)) core=String.fromCharCode(64+((n-1)%26)+1);
+  else if(/^romanLc/.test(type)) core=roman(n);
+  else if(/^romanUc/.test(type)) core=roman(n).toUpperCase();
+  else core=String(n);
+  if(/ParenBoth$/.test(type)) return '('+core+')';
+  if(/ParenR$/.test(type)) return core+')';
+  if(/Period$/.test(type)) return core+'.';
+  return core+'.';
+}
+// snap an arbitrary hex color to the nearest Word named highlight color
+function snapHighlight(hex){
+  if(!hex) return null;
+  // anchors map to Word's named highlight colors; extra mid-tone anchors improve matching
+  const anchors=[
+    ['yellow',[255,255,0]],['yellow',[255,192,0]],   // gold -> yellow
+    ['green',[0,255,0]],['green',[146,208,80]],['green',[112,173,71]], // PPT greens -> green
+    ['cyan',[0,255,255]],['cyan',[0,176,240]],       // PPT light blue -> cyan
+    ['magenta',[255,0,255]],['blue',[0,0,255]],['blue',[68,114,196]],
+    ['red',[255,0,0]],['red',[192,0,0]],
+    ['darkBlue',[0,0,139]],['darkCyan',[0,139,139]],['darkGreen',[0,100,0]],
+    ['darkMagenta',[139,0,139]],['darkRed',[139,0,0]],['darkYellow',[128,128,0]],
+    ['darkGray',[128,128,128]],['lightGray',[211,211,211]],['black',[0,0,0]],['white',[255,255,255]]
+  ];
+  const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+  if([r,g,b].some(isNaN)) return null;
+  let best='yellow',bd=1e9;
+  for(const [name,[nr,ng,nb]] of anchors){ const d=(r-nr)**2+(g-ng)**2+(b-nb)**2; if(d<bd){bd=d;best=name;} }
+  return best;
+}
+// read runs in one paragraph, in document order.
+// returns array of {text,b,i,u,hl} run objects and {br:true} soft-break markers.
+function readRuns(par){
+  const NS='http://schemas.openxmlformats.org/drawingml/2006/main';
+  const out=[];
+  for(const node of par.childNodes){
+    if(node.nodeType!==1) continue;
+    const ln=node.localName;
+    if(ln==='br'){ out.push({br:true}); continue; }
+    if(ln!=='r') continue;
+    const r=node;
+    const rPr=r.getElementsByTagNameNS(NS,'rPr')[0];
+    let b=false,i=false,u=false,hl=null;
+    if(rPr){
+      const bv=rPr.getAttribute('b'); if(bv==='1'||bv==='true') b=true;
+      const iv=rPr.getAttribute('i'); if(iv==='1'||iv==='true') i=true;
+      const uv=rPr.getAttribute('u'); if(uv&&uv!=='none') u=true;
+      const h=rPr.getElementsByTagNameNS(NS,'highlight')[0];
+      if(h){ const c=h.getElementsByTagNameNS(NS,'srgbClr')[0]; if(c) hl=snapHighlight(c.getAttribute('val')); }
+    }
+    let text=''; for(const t of r.getElementsByTagNameNS(NS,'t')) text+=t.textContent;
+    if(text) out.push({text,b,i,u,hl});
+  }
+  return out;
+}
+
+// read per-level bullet defs from a lstStyle-like element -> {level: {kind,...}}
+function readLstStyle(container){
+  const NS='http://schemas.openxmlformats.org/drawingml/2006/main';
+  const map={};
+  if(!container) return map;
+  for(let lv=0;lv<9;lv++){
+    const el=container.getElementsByTagNameNS(NS,'lvl'+(lv+1)+'pPr')[0];
+    if(!el) continue;
+    const none=el.getElementsByTagNameNS(NS,'buNone')[0];
+    const auto=el.getElementsByTagNameNS(NS,'buAutoNum')[0];
+    const bch=el.getElementsByTagNameNS(NS,'buChar')[0];
+    if(none) map[lv]={kind:'none'};
+    else if(auto) map[lv]={kind:'auto',type:auto.getAttribute('type')||'arabicPeriod',start:parseInt(auto.getAttribute('startAt')||'1',10)};
+    else if(bch) map[lv]={kind:'char',char:bch.getAttribute('char')};
+  }
+  return map;
+}
+// effective bullet resolver for one shape: shape lstStyle -> layout ph -> master txStyles
+function makeBulletResolver(shapeSp, layoutDoc, masterDoc, phType, phIdx){
+  const NS='http://schemas.openxmlformats.org/drawingml/2006/main';
+  const NSP='http://schemas.openxmlformats.org/presentationml/2006/main';
+  const layers=[];
+  layers.push(readLstStyle(shapeSp.getElementsByTagNameNS(NS,'lstStyle')[0]));
+  const matchPh=doc=>{
+    if(!doc) return null;
+    for(const sp of doc.getElementsByTagNameNS(NSP,'sp')){
+      const ph=sp.getElementsByTagNameNS(NSP,'ph')[0]; if(!ph) continue;
+      const t=ph.getAttribute('type'), idx=ph.getAttribute('idx');
+      if(phType && t===phType) return sp;
+      if(!phType && phIdx!=null && idx===phIdx) return sp;
+    }
+    return null;
+  };
+  const lp=matchPh(layoutDoc);
+  if(lp) layers.push(readLstStyle(lp.getElementsByTagNameNS(NS,'lstStyle')[0]));
+  if(masterDoc){
+    const txStyles=masterDoc.getElementsByTagNameNS(NSP,'txStyles')[0];
+    if(txStyles){
+      const isTitle=(phType==='title'||phType==='ctrTitle');
+      const tag=isTitle?'titleStyle':((phType==null||phType==='body')?'bodyStyle':'otherStyle');
+      const styleEl=txStyles.getElementsByTagNameNS(NSP,tag)[0]||txStyles.getElementsByTagNameNS(NSP,'bodyStyle')[0];
+      layers.push(readLstStyle(styleEl));
+    }
+  }
+  return level=>{
+    for(const l of layers){ if(l[level]) return l[level]; }
+    for(const l of layers){ if(l[0]) return l[0]; }
+    return null;
+  };
+}
+
+// read paragraphs from a shape. resolver(level) supplies inherited bullet when paragraph has none.
+function extractParas(shape, resolver){
+  const out=[]; const counters={}; // "type@level" -> count
+  const A2='http://schemas.openxmlformats.org/drawingml/2006/main';
+  const bumpAuto=(type,level)=>{
+    const key=type+'@'+level;
+    counters[key]=(counters[key]||0)+1;
+    for(const k in counters){ const kl=parseInt(k.split('@')[1],10); if(kl>level) counters[k]=0; }
+    return autoNumMarker(type,counters[key]);
+  };
+  for(const p of shape.getElementsByTagNameNS(A2,'p')){
+    const fmtRuns=readRuns(p);              // [{text,b,i,u,hl} | {br:true}]
+    const text=fmtRuns.map(r=>r.br?' ':r.text).join('');
+    const pPr=p.getElementsByTagNameNS(A2,'pPr')[0];
+    let level=0, marker='', explicit=false;
+    if(pPr){
+      const lvl=pPr.getAttribute('lvl'); if(lvl) level=parseInt(lvl,10)||0;
+      const none=pPr.getElementsByTagNameNS(A2,'buNone')[0];
+      const auto=pPr.getElementsByTagNameNS(A2,'buAutoNum')[0];
+      const bch=pPr.getElementsByTagNameNS(A2,'buChar')[0];
+      if(none){ marker=''; explicit=true; }
+      else if(auto){ marker=bumpAuto(auto.getAttribute('type')||'arabicPeriod',level); explicit=true; }
+      else if(bch){ marker=bulletGlyph(bch.getAttribute('char')); explicit=true; }
+    }
+    // inherited bullet if paragraph didn't define one and there's actual text
+    if(!explicit && resolver && text.trim()){
+      const def=resolver(level);
+      if(def){
+        if(def.kind==='char') marker=bulletGlyph(def.char);
+        else if(def.kind==='auto') marker=bumpAuto(def.type,level);
+        // kind 'none' -> leave blank
+      }
+    }
+    out.push({text,marker,level,runs:fmtRuns});
+  }
+  return out;
+}
+
+
+/* ---------- PPTX parsing ---------- */
+async function parsePptx(buf){
+  const zip=await JSZip.loadAsync(buf);
+  const parse=s=>new DOMParser().parseFromString(s,'application/xml');
+  const readXml=async path=>{ const f=zip.file(path); return f?parse(await f.async('string')):null; };
+
+  // 1) slide display order via presentation.xml + its rels
+  const pres=await readXml('ppt/presentation.xml');
+  const presRels=await readXml('ppt/_rels/presentation.xml.rels');
+  const relTarget={};
+  for(const rel of presRels.getElementsByTagNameNS(PKG,'Relationship')){
+    relTarget[rel.getAttribute('Id')]=rel.getAttribute('Target');
+  }
+  const orderedSlidePaths=[];
+  const lst=pres.getElementsByTagNameNS(P,'sldIdLst')[0];
+  for(const sid of lst.getElementsByTagNameNS(P,'sldId')){
+    const rid=sid.getAttributeNS(R,'id')||sid.getAttribute('r:id');
+    let t=relTarget[rid]; if(!t) continue;
+    if(t.charAt(0)!=='/') t='ppt/'+t.replace(/^\.\.\//,'').replace(/^ppt\//,'');
+    orderedSlidePaths.push({path:t, hidden:sid.parentNode && false, sldNode:sid});
+  }
+
+  const slides=[]; const fontCount={};
+  for(let i=0;i<orderedSlidePaths.length;i++){
+    const sp=orderedSlidePaths[i].path;             // e.g. ppt/slides/slide4.xml
+    const fileName=sp.split('/').pop();             // slide4.xml
+    const slideXml=await readXml(sp);
+    const hidden = slideXml.documentElement.getAttribute('show')==='0';
+
+    // resolve this slide's layout + master (for inherited bullets)
+    let layoutDoc=null, masterDoc=null;
+    try{
+      const sRels=await readXml(sp.replace(/slides\/([^/]+)$/,'slides/_rels/$1.rels'));
+      let layoutTarget=null;
+      if(sRels) for(const rel of sRels.getElementsByTagNameNS(PKG,'Relationship')){
+        if((rel.getAttribute('Type')||'').indexOf('slideLayout')>=0){ layoutTarget=rel.getAttribute('Target'); break; }
+      }
+      if(layoutTarget){
+        const lp='ppt/'+layoutTarget.replace(/^\.\.\//,'');
+        layoutDoc=await readXml(lp);
+        const lRels=await readXml(lp.replace(/slideLayouts\/([^/]+)$/,'slideLayouts/_rels/$1.rels'));
+        let masterTarget=null;
+        if(lRels) for(const rel of lRels.getElementsByTagNameNS(PKG,'Relationship')){
+          if((rel.getAttribute('Type')||'').indexOf('slideMaster')>=0){ masterTarget=rel.getAttribute('Target'); break; }
+        }
+        if(masterTarget) masterDoc=await readXml('ppt/'+masterTarget.replace(/^\.\.\//,''));
+      }
+    }catch(e){}
+
+    // title + body, paragraph-aware (keeps line breaks and list markers)
+    let title='', body=[];   // body = array of {text, marker, level}
+    for(const sp2 of slideXml.getElementsByTagNameNS(P,'sp')){
+      const ph=sp2.getElementsByTagNameNS(P,'ph')[0];
+      const phType=ph?ph.getAttribute('type'):null;
+      const phIdx=ph?ph.getAttribute('idx'):null;
+      const isTitle = phType==='title'||phType==='ctrTitle';
+      // tally fonts for "keep font"
+      for(const rpr of sp2.getElementsByTagNameNS(A,'rPr')){
+        const lt=rpr.getElementsByTagNameNS(A,'latin')[0];
+        if(lt){ const f=lt.getAttribute('typeface'); if(f&&f.charAt(0)!=='+'){ fontCount[f]=(fontCount[f]||0)+1; } }
+      }
+      const resolver=makeBulletResolver(sp2,layoutDoc,masterDoc,phType,phIdx);
+      const shapeParas=extractParas(sp2,isTitle?null:resolver); // no bullets on title
+      if(isTitle && !title){ title=shapeParas.map(p=>p.text).join(' ').trim(); }
+      else { for(const p of shapeParas){ if(p.text.trim()!=='' ) body.push(p); } }
+    }
+
+    // notes: resolve via this slide's rels
+    let notes='';                 // plain string (for word count / detection)
+    let notesRuns=[];             // array of paragraphs; each = array of {text,b,i,u}
+    const relsPath=sp.replace(/slides\/([^/]+)$/,'slides/_rels/$1.rels');
+    const slideRels=await readXml(relsPath);
+    if(slideRels){
+      let notesTarget=null;
+      for(const rel of slideRels.getElementsByTagNameNS(PKG,'Relationship')){
+        if((rel.getAttribute('Type')||'').indexOf('notesSlide')>=0){ notesTarget=rel.getAttribute('Target'); break; }
+      }
+      if(notesTarget){
+        let np='ppt/'+notesTarget.replace(/^\.\.\//,'');
+        const notesXml=await readXml(np);
+        if(notesXml){
+          // real notes = body placeholder; skip sldImg / sldNum placeholders
+          for(const sp3 of notesXml.getElementsByTagNameNS(P,'sp')){
+            const ph=sp3.getElementsByTagNameNS(P,'ph')[0];
+            const phType=ph?ph.getAttribute('type'):null;
+            if(phType==='sldImg'||phType==='sldNum'||phType==='dt'||phType==='ftr') continue;
+            const marked=extractParas(sp3,null); // markers explicit in notes; parallel to runs
+            const parEls=[...sp3.getElementsByTagNameNS(A,'p')];
+            parEls.forEach((par,idx)=>{
+              const runs=readRuns(par);
+              if(runs.some(r=>r.text)){
+                const m=marked[idx]||{marker:'',level:0};
+                notesRuns.push({runs,marker:m.marker,level:m.level});
+              }
+            });
+          }
+          notes=notesRuns.map(p=>p.runs.map(r=>r.br?' ':r.text).join('')).join('\n').trim();
+        }
+      }
+    }
+
+    slides.push({ num:i+1, fileName, title, body, notes, notesRuns, hidden });
+  }
+
+  // dominant font
+  let best=null,bestN=0; for(const f in fontCount){ if(fontCount[f]>bestN){best=f;bestN=fontCount[f];} }
+  deckFont=best;
+
+  return slides;
+}
+
+/* ---------- helpers ---------- */
+function wordCount(s){ return s.trim()? s.trim().split(/\s+/).length : 0; }
+function splitSentences(s){ return s.split(/\n/).flatMap(line=> line.split(/(?<=[.?!])\s+/) ).filter(x=>x.trim()); }
+
+// returns array of {text, marker, level, blank} lines (title first, blank line after)
+function slideLines(sl){
+  const lines=[];
+  if(sl.title){
+    lines.push({text:sl.title,marker:'',level:0});
+    if(sl.body.length) lines.push({text:'',marker:'',level:0,blank:true}); // spacer after title
+  }
+  for(const p of sl.body) lines.push(p);
+  return lines;
+}
+// one line's display text with marker prefix (for preview)
+function lineText(l){
+  const indent='    '.repeat(l.level||0);
+  return indent+(l.marker?l.marker+' ':'')+l.text;
+}
+function slideTextPlain(sl){ return slideLines(sl).map(lineText).join('\n'); }
+
+// does this slide's notes count as RISE content?
+function isRise(sl,cfg){
+  if(!cfg.riseOn) return false;
+  const kw=(cfg.riseKw||'RISE').trim(); if(!kw) return false;
+  if(cfg.riseCase) return sl.notes.indexOf(kw)>=0;               // case-sensitive: RISE ≠ rise
+  return sl.notes.toLowerCase().indexOf(kw.toLowerCase())>=0;    // case-insensitive
+}
+
+/* ---------- summary ---------- */
+function summarize(slides,cfg){
+  cfg=cfg||{};
+  // teleprompter count = script notes only; RISE notes excluded
+  const scriptSlides=slides.filter(s=>!isRise(s,cfg));
+  const totalWords=scriptSlides.reduce((a,s)=>a+wordCount(s.notes),0);
+  const riseSlides=slides.filter(s=>isRise(s,cfg));
+  const riseWords=riseSlides.reduce((a,s)=>a+wordCount(s.notes),0);
+  const hidden=slides.filter(s=>s.hidden).length;
+  const noNotes=slides.filter(s=>!s.notes.trim()).length;
+  return { slides:slides.length, words:totalWords, minutes:totalWords/WPM,
+           hidden, noNotes, riseCount:riseSlides.length, riseWords };
+}
+
+/* ---------- preview ---------- */
+function renderPreview(slides,cfg){
+  const riseCol=cfg.riseOn;
+  let h='<table><thead><tr><th>Video</th><th>Slide #</th><th>PPT text content</th><th>Script (PPT Notes)</th>'
+        +(riseCol?'<th>RISE</th>':'')+'</tr></thead><tbody>';
+  for(const s of slides){
+    const esc=t=>t.replace(/</g,'&lt;');
+    const hlCss={yellow:'#ffff00',green:'#00ff00',cyan:'#00ffff',magenta:'#ff00ff',blue:'#0000ff',red:'#ff0000',darkBlue:'#00008b',darkCyan:'#008b8b',darkGreen:'#006400',darkMagenta:'#8b008b',darkRed:'#8b0000',darkYellow:'#808000',darkGray:'#a9a9a9',lightGray:'#d3d3d3',black:'#000000',white:'#ffffff'};
+    const runHtml=r=>{
+      if(r.br) return '<br>';
+      let t=esc(r.text);
+      if(r.b)t='<strong>'+t+'</strong>'; if(r.i)t='<em>'+t+'</em>'; if(r.u)t='<u>'+t+'</u>';
+      if(r.hl)t='<span style="background:'+(hlCss[r.hl]||'#ffff00')+'">'+t+'</span>';
+      return t;
+    };
+    const pfx=p=>('&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(p.level||0))+(p.marker?esc(p.marker)+'&nbsp;':'');
+    // slide text: formatted runs + marker + indent + blank line after title
+    const st=slideLines(s).map(l=>{
+      if(l.blank) return '';
+      const inner=(l.runs&&l.runs.length)?l.runs.map(runHtml).join(''):esc(l.text);
+      return pfx(l)+inner;
+    }).join('<br>');
+    let notes='';
+    if(cfg.onePerLine){
+      const lines=[];
+      for(const para of (s.notesRuns||[])){
+        let cur=pfx(para); let started=false;
+        for(const r of para.runs){
+          if(r.br){ if(started)lines.push(cur); cur=''; started=false; continue; }
+          const pieces=r.text.split(/(?<=[.?!])\s+/);
+          pieces.forEach((piece,idx)=>{ if(piece){cur+=runHtml({...r,text:piece});started=true;} if(idx<pieces.length-1){ if(started)lines.push(cur); cur=''; started=false; } });
+        }
+        if(started||cur)lines.push(cur);
+      }
+      notes=lines.join('<br>');
+    } else {
+      notes=(s.notesRuns||[]).map(para=>pfx(para)+para.runs.map(runHtml).join('')).join('<br>');
+    }
+    const flag=s.hidden?' <span class="warn">(hidden)</span>':'';
+    const rise=isRise(s,cfg);
+    // when RISE column on: route this slide's notes to RISE, leave Script empty
+    const scriptCell = (riseCol && rise) ? '' : (notes||'<span class="mini">— no notes —</span>');
+    const riseCell   = rise ? (notes||'') : '';
+    h+=`<tr><td></td><td>${s.num}${flag}</td><td>${st}</td><td class="notes">${scriptCell}</td>`
+       +(riseCol?`<td class="notes">${riseCell||'<span class="mini">—</span>'}</td>`:'')+`</tr>`;
+  }
+  return h+'</tbody></table>';
+}
+
+function renderDashboard(slides,cfg){
+  const sum=summarize(slides,cfg);
+  $('s_slides').textContent=sum.slides;
+  $('s_words').textContent=sum.words.toLocaleString();
+  $('s_time').textContent='~'+Math.round(sum.minutes);
+  const flags=[];
+  if(sum.riseCount) flags.push(sum.riseCount+' RISE slide'+(sum.riseCount>1?'s':'')+' ('+sum.riseWords.toLocaleString()+' words) excluded from teleprompter time');
+  if(sum.hidden) flags.push(sum.hidden+' hidden slide'+(sum.hidden>1?'s':''));
+  if(sum.noNotes) flags.push(sum.noNotes+' slide'+(sum.noNotes>1?'s':'')+' with no notes');
+  $('s_flags').innerHTML = flags.length? '⚠ '+flags.join(' · ') : 'All slides have notes.';
+  return sum;
+}
+
+/* ---------- docx build ---------- */
+async function buildDocx(slides,cfg,label,summary){
+  const d=window.docx;
+  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,
+         HeadingLevel,AlignmentType,ShadingType,PageOrientation,VerticalAlign}=d;
+
+  const chosenFont = cfg.fontMode==='convert' ? cfg.font : (deckFont||'Arial');
+  const riseCol=cfg.riseOn;
+  const widths = riseCol ? [1300,900,5100,3550,3550] : [1500,1000,6000,5900];
+
+  const cell=(children,w)=>new TableCell({
+    width:{size:w,type:WidthType.DXA},
+    verticalAlign:VerticalAlign.TOP,
+    children:children
+  });
+  const paras=text=>{
+    if(!text) return [new Paragraph({children:[new TextRun('')]})];
+    return String(text).split('\n').map(line=>new Paragraph({children:[new TextRun(line)]}));
+  };
+  // shared run builder: bold/italic/underline/highlight + soft break
+  const mkRun=r=>{
+    if(r.br) return new TextRun({break:1});
+    return new TextRun({text:r.text,bold:r.b||undefined,italics:r.i||undefined,
+      underline:r.u?{}:undefined,highlight:r.hl||undefined});
+  };
+  // structured slide body: blank line after title + indentation + marker prefix + run formatting
+  const slideParas=sl=>{
+    const lines=slideLines(sl);
+    if(!lines.length) return [new Paragraph({children:[new TextRun('')]})];
+    return lines.map(l=>{
+      if(l.blank) return new Paragraph({children:[new TextRun('')]});
+      const indentLeft=(l.level||0)*360; // 0.25" per level, in twips
+      const kids=[];
+      if(l.marker) kids.push(new TextRun(l.marker+' '));
+      if(l.runs&&l.runs.length) l.runs.forEach(r=>kids.push(mkRun(r)));
+      else kids.push(new TextRun(l.text||''));
+      return new Paragraph({ indent: indentLeft?{left:indentLeft}:undefined, children:kids });
+    });
+  };
+  // formatted notes: preserve marker + indent + bold/italic/underline/highlight + soft breaks
+  const notesFormatted=(runsParas)=>{
+    if(!runsParas||!runsParas.length) return [new Paragraph({children:[new TextRun('')]})];
+    const indentOf=p=>(p.level||0)*360;
+    const markerRun=p=>p.marker?[new TextRun(p.marker+' ')]:[];
+    if(cfg.onePerLine){
+      const out=[];
+      for(const para of runsParas){
+        let cur=[]; let first=true;
+        const flush=()=>{ if(cur.length){ out.push(new Paragraph({indent:indentOf(para)?{left:indentOf(para)}:undefined,children:(first?markerRun(para):[]).concat(cur.map(mkRun))})); first=false; cur=[]; } };
+        for(const r of para.runs){
+          if(r.br){ cur.push({br:true}); continue; }   // soft break stays within the line
+          const pieces=r.text.split(/(?<=[.?!])\s+/);
+          pieces.forEach((piece,idx)=>{
+            if(piece) cur.push({text:piece,b:r.b,i:r.i,u:r.u,hl:r.hl});
+            if(idx<pieces.length-1) flush();
+          });
+        }
+        flush();
+      }
+      return out.length?out:[new Paragraph({children:[new TextRun('')]})];
+    }
+    return runsParas.map(para=>new Paragraph({
+      indent: indentOf(para)?{left:indentOf(para)}:undefined,
+      children: markerRun(para).concat(para.runs.map(mkRun))
+    }));
+  };
+  const headCell=(t,w)=>new TableCell({
+    width:{size:w,type:WidthType.DXA},
+    shading:{type:ShadingType.CLEAR,fill:'F2E4D5'},
+    children:[new Paragraph({children:[new TextRun({text:t,bold:true})]})]
+  });
+
+  const headChildren=[
+    headCell('Video',widths[0]),headCell('Slide #',widths[1]),
+    headCell('PPT text content',widths[2]),headCell('Script (PPT Notes)',widths[3])
+  ];
+  if(riseCol) headChildren.push(headCell('RISE',widths[4]));
+  const rows=[ new TableRow({tableHeader:true,children:headChildren}) ];
+
+  const emptyPara=()=>[new Paragraph({children:[new TextRun('')]})];
+  for(const s of slides){
+    const notesParas = notesFormatted(s.notesRuns);
+    const rise = isRise(s,cfg);
+    // when RISE column on: notes go to RISE for tagged slides, Script left empty
+    const scriptChildren = (riseCol && rise) ? emptyPara() : (notesParas.length?notesParas:emptyPara());
+    const rowCells=[
+      cell(emptyPara(),widths[0]),
+      cell([new Paragraph(String(s.num)+(s.hidden?' (hidden)':''))],widths[1]),
+      cell(slideParas(s),widths[2]),
+      cell(scriptChildren,widths[3])
+    ];
+    if(riseCol){
+      const riseChildren = rise ? (notesParas.length?notesParas:emptyPara()) : emptyPara();
+      rowCells.push(cell(riseChildren,widths[4]));
+    }
+    rows.push(new TableRow({children:rowCells}));
+  }
+
+  const table=new Table({ rows, width:{size:14400,type:WidthType.DXA},
+    columnWidths:widths });
+
+  const riseNote = (cfg.riseOn && summary.riseCount) ? `  ·  ${summary.riseCount} RISE slide${summary.riseCount>1?'s':''} (${summary.riseWords.toLocaleString()} words, excluded)` : '';
+  const summaryLine=`${summary.slides} slides · ${summary.words.toLocaleString()} script notes words · ~${Math.round(summary.minutes)} min @ ${WPM} wpm${riseNote}`;
+
+  const doc=new Document({
+    styles:{ default:{ document:{ run:{ font:chosenFont } } } },
+    sections:[{
+      properties:{ page:{ size:{ orientation:PageOrientation.LANDSCAPE },
+        margin:{ top:720,bottom:720,left:720,right:720 } } },
+      children:[
+        new Paragraph({children:[new TextRun({text:`PPD — ${label}`,bold:true,size:28})]}),
+        new Paragraph({children:[new TextRun({text:summaryLine,color:'6A737D',size:18})]}),
+        new Paragraph({children:[new TextRun({text:'Please verify: (1) Tables, charts, images and SmartArt cannot be extracted — check each slide against the original PPTX by Slide # and add them manually. (2) Within a cell, text order follows the file\u2019s reading order, which is not always top-to-bottom on the slide.',italics:true,color:'B45C17',size:16})]}),
+        new Paragraph({children:[new TextRun('')]}),
+        table
+      ]
+    }]
+  });
+  return Packer.toBlob(doc);
+}
+
+/* ---------- config + refresh ---------- */
+function readConfig(){
+  return {
+    fontMode:document.querySelector('input[name=font]:checked').value,
+    font:$('fontChoice').value,
+    onePerLine:$('onePerLine').checked,
+    riseOn:$('riseOn').checked,
+    riseKw:$('riseKw').value,
+    riseCase:$('riseCase').checked
+  };
+}
+let lastSummary=null;
+function refresh(){
+  if(!parsedSlides) return;
+  const cfg=readConfig();
+  $('preview').innerHTML=renderPreview(parsedSlides,cfg);
+  lastSummary=renderDashboard(parsedSlides,cfg);
+}
+
+/* ---------- label + autodetect ---------- */
+function updateLabel(){
+  const c=$('course').value.trim()||'COURSE'; const w=$('week').value.trim()||'?';
+  $('vidlabel').textContent=`${c}_Wk${w}`; return `${c}_Wk${w}`;
+}
+function autoFill(slides){
+  const head=slides.slice(0,3).map(s=>[s.title,...s.body].join(' ')).join(' ');
+  let detected=false;
+  if(!$('week').value.trim()){ const m=head.match(/week\s*#?\s*(\d+)/i); if(m){$('week').value=m[1];detected=true;} }
+  if(!$('course').value.trim()){ const cm=head.match(/\b([A-Za-z]{2,6})\s*[-_ .]?\s*(\d{2,4}[A-Za-z]?)\b/);
+    if(cm){$('course').value=(cm[1]+cm[2]).toUpperCase();detected=true;} }
+  $('detectPill').textContent = detected ? 'auto-detected — please verify' : 'not detected — please enter';
+}
+
+/* ---------- file handling ---------- */
+const drop=$('drop'), fileInput=$('file');
+drop.addEventListener('click',()=>fileInput.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('hot')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('hot'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('hot');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])});
+
+function setStatus(m,t){ const s=$('status'); s.className='status '+t; s.textContent=m; }
+
+async function handleFile(f){
+  if(!f.name.toLowerCase().endsWith('.pptx')){ $('filechip').textContent='Please choose a .pptx file.'; return; }
+  $('filechip').textContent='📊 '+f.name+' — parsing…';
+  try{
+    const buf=await f.arrayBuffer();
+    parsedSlides=await parsePptx(buf);
+    autoFill(parsedSlides); updateLabel();
+    ['courseCard','settingsCard','summaryCard','genCard'].forEach(id=>$(id).classList.remove('hidden'));
+    $('filechip').textContent='📊 '+f.name;
+    refresh();
+  }catch(err){ console.error(err); $('filechip').textContent='Could not read this file: '+err.message; }
+}
+
+/* ---------- setting listeners ---------- */
+document.querySelectorAll('input[name=font]').forEach(r=>r.addEventListener('change',()=>{
+  $('fontPick').style.opacity=(document.querySelector('input[name=font]:checked').value==='convert')?'1':'.5'; refresh();
+}));
+$('fontChoice').addEventListener('change',refresh);
+$('onePerLine').addEventListener('change',refresh);
+$('course').addEventListener('input',()=>{updateLabel();});
+$('week').addEventListener('input',()=>{updateLabel();});
+$('riseOn').addEventListener('change',()=>{
+  $('riseKwWrap').style.opacity = $('riseOn').checked ? '1' : '.5';
+  refresh();
+});
+$('riseKw').addEventListener('input',refresh);
+$('riseCase').addEventListener('change',refresh);
+
+/* ---------- generate ---------- */
+$('go').addEventListener('click',async()=>{
+  if(!parsedSlides) return;
+  $('go').disabled=true; setStatus('Building .docx…','info');
+  try{
+    const cfg=readConfig();
+    const summary=summarize(parsedSlides,cfg);
+    const label=updateLabel();
+    const blob=await buildDocx(parsedSlides,cfg,label,summary);
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=`PPD_${label}.docx`; a.click(); URL.revokeObjectURL(a.href);
+    setStatus('Done — downloaded PPD_'+label+'.docx','ok');
+  }catch(err){ console.error(err); setStatus('Build failed: '+err.message,'err'); }
+  $('go').disabled=false;
+});
+
+updateLabel();
+</script>
+</body>
+</html>
