@@ -10,7 +10,8 @@ device — there is no server and no upload.
 ## Live tool
 
 👉 [Access to the Script to PPD Converter](https://jiayujiang59.github.io/Script-to-PPD-Converter/)
-👉 [Access to the PPTX to PPD Converter] (https://jiayujiang59.github.io/Script-to-PPD-Converter/pptx/)
+
+👉 [Access to the PPTX to PPD Converter](https://jiayujiang59.github.io/Script-to-PPD-Converter/pptx/)
 
 ## What it does
 
