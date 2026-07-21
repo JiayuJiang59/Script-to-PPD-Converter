@@ -105,6 +105,10 @@
         <input type="text" id="week" placeholder="e.g. 1" value=""></div>
     </div>
     <div class="hint">Video label: <strong><span id="vidlabel">…</span></strong>. Edit either field if the detection isn't right.</div>
+    <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <label class="chk"><input type="checkbox" id="noPlayposit"> This script has <strong>no PlayPosit</strong> content</label>
+      <div class="mini" style="margin-top:4px">When checked, the PlayPosit column is removed from the output (3 columns: Videos · Graphics · Script), and PlayPosit is dropped from the color mapping and styling options.</div>
+    </div>
   </div>
 
   <!-- STEP 3: SETTINGS + PREVIEW -->
@@ -210,7 +214,7 @@
           <option value="white">White background, keep original colors</option>
           <option value="tint">Light green background, black text</option>
         </select></div>
-      <div class="map-row"><span class="name">PlayPosit</span>
+      <div class="map-row" id="ppStyleRow"><span class="name">PlayPosit</span>
         <select id="style_pp">
           <option value="tint">Light orange background, black text</option>
           <option value="white">White background, keep original colors</option>
@@ -550,13 +554,14 @@ function buildRows(paras, config){
   const order = ['graphic','video','script','playposit','animation','fdnotes'];
 
   // helper: get the destination of a segment
+  function reroute(d){ return (config.noPp && d==='playposit') ? 'graphic' : d; }
   function destOfColorSeg(seg){
     if(seg.cls==='black') return 'script';
-    return dest[seg.cls] || 'graphic';
+    return reroute(dest[seg.cls] || 'graphic');
   }
   function destOfFormatSeg(seg){
     if(seg.sig==='plain') return 'script';
-    return fdest[seg.sig] || 'graphic';
+    return reroute(fdest[seg.sig] || 'graphic');
   }
 
   // Convert a paragraph into a list of {dest, segs:[segObj]} groups, preserving marker/align.
@@ -869,7 +874,8 @@ function segsToHtml(segs, colMode, cleanSet){
 
 function renderPreview(rows, cfg){
   const cleanSet=cfg.cleanSet;
-  let html='<table><tr><th>Videos</th><th>Graphics</th><th>Script</th><th>PlayPosit</th></tr>';
+  const ppCol = !cfg.noPp;
+  let html='<table><tr><th>Videos</th><th>Graphics</th><th>Script</th>'+(ppCol?'<th>PlayPosit</th>':'')+'</tr>';
   rows.forEach(row=>{
     if(row.type==='heading'){
       const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
@@ -881,19 +887,21 @@ function renderPreview(rows, cfg){
         +`<td><strong>${numInVideo?numLabel:''}</strong></td>`
         +`<td><strong>${title}</strong></td>`
         +`<td><strong>${scriptText}</strong></td>`
-        +`<td></td></tr>`;
+        +(ppCol?`<td></td>`:'')+`</tr>`;
       return;
     }
+    const scriptTintActive = (cfg.styleScript==='tint' && row.graphics.length>0);
+    const effScriptStyle = scriptTintActive ? 'tint' : (cfg.styleScript==='tint' ? 'white' : cfg.styleScript);
     const v=segsToHtml(row.video,cfg.styleVideo,cleanSet);
     const g=segsToHtml(row.graphics,cfg.styleGraphic,cleanSet);
-    const sc=segsToHtml(row.script,cfg.styleScript,cleanSet);
+    const sc=segsToHtml(row.script,effScriptStyle,cleanSet);
     const pp=segsToHtml(row.playposit,cfg.stylePp,cleanSet);
     const bg=(m,d)=> m==='tint'?`background:${TINT[d]}`:'';
     html+=`<tr>`
       +`<td style="${row.video.length?bg(cfg.styleVideo,'video'):''}">${v}</td>`
       +`<td style="${row.graphics.length?bg(cfg.styleGraphic,'graphic'):''}">${g}</td>`
-      +`<td style="${row.script.length?bg(cfg.styleScript,'script'):''}">${sc}</td>`
-      +`<td style="${row.playposit.length?bg(cfg.stylePp,'playposit'):''}">${pp}</td></tr>`;
+      +`<td style="${(row.script.length&&scriptTintActive)?bg('tint','script'):''}">${sc}</td>`
+      +(ppCol?`<td style="${row.playposit.length?bg(cfg.stylePp,'playposit'):''}">${pp}</td>`:'')+`</tr>`;
   });
   html+='</table>';
   return html;
@@ -913,7 +921,8 @@ async function buildDocx(rows, cfg, videoLabel, summary){
   const {Document,Packer,Paragraph,TextRun,Tab,Table,TableRow,TableCell,WidthType,BorderStyle,ShadingType}=D;
   const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
   const borders={top:border,bottom:border,left:border,right:border};
-  const colW=[2200,4400,6400,1400]; const totalW=14400;
+  const colW = cfg.noPp ? [2400,5000,7000] : [2200,4400,6400,1400];
+  const totalW=14400;
   const margins={top:60,bottom:60,left:100,right:100};
   const cleanSet=cfg.cleanSet;
 
@@ -979,19 +988,23 @@ async function buildDocx(rows, cfg, videoLabel, summary){
     return out.map(o=>new Paragraph({children:o.children.length?o.children:[new TextRun('')],alignment:o.align}));
   }
 
-  const metaRow=new TableRow({children:[
+  const metaCells=[
     cell([new Paragraph('')],colW[0]),
     cell([new Paragraph({children:[new TextRun({text:'Team:    ID:    VP:    VE:    MMD:',color:'808080'})]})],colW[1]),
     cell([new Paragraph('')],colW[2]),
-    cell([new Paragraph('')],colW[3]),
-  ]});
+  ];
+  if(!cfg.noPp) metaCells.push(cell([new Paragraph('')],colW[3]));
+  const metaRow=new TableRow({children:metaCells});
 
-  function headerRowNew(){ return new TableRow({children:[
-    cell([new Paragraph({children:[new TextRun({text:'Videos',bold:true})]})],colW[0],'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})],colW[1],'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})],colW[2],'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})],colW[3],'E8E6DF'),
-  ]}); }
+  function headerRowNew(){
+    const cells=[
+      cell([new Paragraph({children:[new TextRun({text:'Videos',bold:true})]})],colW[0],'E8E6DF'),
+      cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})],colW[1],'E8E6DF'),
+      cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})],colW[2],'E8E6DF'),
+    ];
+    if(!cfg.noPp) cells.push(cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})],colW[3],'E8E6DF'));
+    return new TableRow({children:cells});
+  }
 
   function makeRow(row){
     if(row.type==='heading'){
@@ -1000,19 +1013,26 @@ async function buildDocx(rows, cfg, videoLabel, summary){
       const title = row.heading.title;
       const numInVideo = (cfg.headingPlace==='videoonly');
       const scriptText = numInVideo ? title : (numLabel+': '+title);
-      return new TableRow({children:[
+      const hc=[
         cell([new Paragraph({children:[new TextRun({text: numInVideo ? numLabel : '', bold:true})]})],colW[0],'E5F4E0'),
         cell([new Paragraph({children:[new TextRun({text:title,bold:true})]})],colW[1],'E5F4E0'),
         cell([new Paragraph({children:[new TextRun({text:scriptText,bold:true})]})],colW[2],'E5F4E0'),
-        cell([new Paragraph('')],colW[3],'E5F4E0'),
-      ]});
+      ];
+      if(!cfg.noPp) hc.push(cell([new Paragraph('')],colW[3],'E5F4E0'));
+      return new TableRow({children:hc});
     }
-    return new TableRow({children:[
+    // Script green tint applies ONLY when the row also has a graphic; otherwise the Script
+    // cell stays white. The text color mode must match the actual background of THIS row.
+    const scriptTintActive = (cfg.styleScript==='tint' && row.graphics.length>0);
+    const effScriptStyle = scriptTintActive ? 'tint' : (cfg.styleScript==='tint' ? 'white' : cfg.styleScript);
+    const scriptShade = (row.script.length && scriptTintActive) ? shadeHex('tint','script') : undefined;
+    const dc=[
       cell(paras(row.video,cfg.styleVideo), colW[0], row.video.length?shadeHex(cfg.styleVideo,'video'):undefined),
       cell(paras(row.graphics,cfg.styleGraphic), colW[1], row.graphics.length?shadeHex(cfg.styleGraphic,'graphic'):undefined),
-      cell(paras(row.script,cfg.styleScript), colW[2], row.script.length?shadeHex(cfg.styleScript,'script'):undefined),
-      cell(paras(row.playposit,cfg.stylePp), colW[3], row.playposit.length?shadeHex(cfg.stylePp,'playposit'):undefined),
-    ]});
+      cell(paras(row.script,effScriptStyle), colW[2], scriptShade),
+    ];
+    if(!cfg.noPp) dc.push(cell(paras(row.playposit,cfg.stylePp), colW[3], row.playposit.length?shadeHex(cfg.stylePp,'playposit'):undefined));
+    return new TableRow({children:dc});
   }
 
   const defFont = cfg.fontMode==='convert' ? cfg.fontChoice : (cfg.scriptFont || 'Arial');
@@ -1076,20 +1096,23 @@ function readConfig(){
     graphicDup:document.querySelector('input[name=graphicDup]:checked').value,
     styleVideo:$('style_video').value, styleGraphic:$('style_graphic').value,
     styleScript:$('style_script').value, stylePp:$('style_pp').value,
+    noPp: $('noPlayposit').checked,
   };
 }
 
 /* ----- build the color-map rows from detected colors ----- */
 function buildColorMap(){
   const box=$('colorMapRows'); box.innerHTML='';
-  const opts=['graphic','video','script','playposit','fdnotes','animation'];
+  const noPp=$('noPlayposit').checked;
+  const opts=['graphic','video','script','playposit','fdnotes','animation'].filter(o=>!(noPp&&o==='playposit'));
   if(!detectedColors.length){ box.innerHTML='<p class="mini">No colored text detected. Everything will go to the Script column.</p>'; return; }
   detectedColors.forEach(c=>{
     const row=document.createElement('div'); row.className='map-row';
     const sw=`<span class="swatch" style="background:${COLOR_HEX[c]||'#999'}"></span>`;
     const name=`<span class="name">${c[0].toUpperCase()+c.slice(1)}</span>`;
     let sel=`<select id="cmap_${c}">`;
-    opts.forEach(o=>{ sel+=`<option value="${o}"${ (DEFAULT_COLOR_DEST[c]===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
+    let def=DEFAULT_COLOR_DEST[c]; if(noPp && def==='playposit') def='graphic';
+    opts.forEach(o=>{ sel+=`<option value="${o}"${ (def===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
     sel+='</select>';
     row.innerHTML=sw+name+sel;
     box.appendChild(row);
@@ -1098,14 +1121,16 @@ function buildColorMap(){
 /* ----- format-map rows ----- */
 function buildFormatMap(){
   const box=$('formatMapRows'); box.innerHTML='';
-  const opts=['graphic','video','script','playposit','fdnotes','animation'];
+  const noPp=$('noPlayposit').checked;
+  const opts=['graphic','video','script','playposit','fdnotes','animation'].filter(o=>!(noPp&&o==='playposit'));
   const fmts=[['underline','Underline'],['bold','Bold'],['italic','Italic']];
   fmts.forEach(([fm,label])=>{
     const present=detectedFormats.includes(fm);
     const row=document.createElement('div'); row.className='map-row';
     const name=`<span class="name">${label}${present?'':' <span class="mini">(none found)</span>'}</span>`;
     let sel=`<select id="fmap_${fm}">`;
-    opts.forEach(o=>{ sel+=`<option value="${o}"${ (DEFAULT_FORMAT_DEST[fm]===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
+    let def=DEFAULT_FORMAT_DEST[fm]; if(noPp && def==='playposit') def='graphic';
+    opts.forEach(o=>{ sel+=`<option value="${o}"${ (def===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
     sel+='</select>';
     row.innerHTML=name+sel;
     box.appendChild(row);
@@ -1135,7 +1160,7 @@ function renderDashboard(rows, cfg){
     +stat(c.graphic,'Graphic elements')
     +stat(c.animation,'Animations')
     +stat(c.video,'Video elements')
-    +stat(c.playposit,'PlayPosit elements')
+    +(cfg.noPp?'':stat(c.playposit,'PlayPosit elements'))
     +stat(c.fdnotes,'FD notes')
     +stat(sum.totalWords,'Script words')
     +stat(Math.round(sum.totalMinutes)+' min','Teleprompter @ '+WPM+' wpm')
@@ -1278,6 +1303,12 @@ document.querySelectorAll('.clean').forEach(c=>c.addEventListener('change',refre
 ['style_video','style_graphic','style_script','style_pp'].forEach(id=>$(id).addEventListener('change',refresh));
 document.querySelectorAll('input[name=headingPlace]').forEach(r=>r.addEventListener('change',refresh));
 document.querySelectorAll('input[name=graphicDup]').forEach(r=>r.addEventListener('change',refresh));
+$('noPlayposit').addEventListener('change',()=>{
+  const on=$('noPlayposit').checked;
+  $('ppStyleRow').style.display = on ? 'none' : '';
+  buildColorMap(); buildFormatMap();
+  refresh();
+});
 $('addLevel').addEventListener('click',()=>{ levelTerms.push('Part'); buildLevelRows(); refresh(); });
 $('course').addEventListener('input',()=>{updateLabel();refresh();});
 $('week').addEventListener('input',()=>{updateLabel();refresh();});
