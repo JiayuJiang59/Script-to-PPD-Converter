@@ -8,764 +8,1303 @@
   :root{
     --bg:#faf9f6; --card:#ffffff; --ink:#1f2328; --muted:#6a737d;
     --line:#e3e1da; --accent:#3a6ea5; --accent-d:#2c557f;
-    --green:#2e7d32; --red:#c00000; --soft:#f4f2ec;
-    --radius:14px;
+    --soft:#f4f2ec; --radius:14px;
+    --c-green:#2e7d32; --c-red:#c00000; --c-blue:#0F9ED5; --c-pink:#e83e8c; --c-purple:#7048b6;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.5;
-    padding:24px 16px 80px;
-  }
-  .wrap{max-width:760px; margin:0 auto}
-  h1{font-size:1.45rem; margin:0 0 4px}
-  .sub{color:var(--muted); font-size:.92rem; margin:0 0 22px}
-  .card{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-    padding:20px; margin-bottom:16px;
-  }
-  .step-num{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
-    font-size:.8rem; font-weight:700; margin-right:8px; flex:0 0 auto;
-  }
-  .step-head{display:flex; align-items:center; font-weight:650; margin-bottom:12px; font-size:1.02rem}
-  label.opt{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--line);
-    border-radius:10px; margin-bottom:8px; cursor:pointer; transition:.15s; background:var(--card)}
-  label.opt:hover{border-color:var(--accent); background:var(--soft)}
-  label.opt input{margin-top:3px; flex:0 0 auto}
-  .opt .t{font-weight:600; font-size:.93rem}
-  .opt .d{color:var(--muted); font-size:.82rem; margin-top:2px}
-  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
-  .field label{font-size:.85rem; font-weight:600; color:var(--ink)}
-  .field input[type=text]{padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:.95rem}
-  .row2{display:flex; gap:12px}
-  .row2 .field{flex:1}
-  #drop{
-    border:2px dashed var(--line); border-radius:12px; padding:30px 16px; text-align:center;
-    color:var(--muted); cursor:pointer; transition:.15s; background:var(--soft);
-  }
-  #drop.hot{border-color:var(--accent); background:#eef4fa; color:var(--accent-d)}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;padding:24px 16px 80px;}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:1.45rem;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.92rem;margin:0 0 22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+  .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:.8rem;font-weight:700;margin-right:8px;flex:0 0 auto}
+  .step-head{display:flex;align-items:center;font-weight:650;margin-bottom:12px;font-size:1.02rem}
+  .setting{border-top:1px solid var(--line);padding:16px 0 4px}
+  .setting:first-of-type{border-top:none;padding-top:0}
+  .setting h4{margin:0 0 4px;font-size:.98rem}
+  .setting .instr{color:var(--muted);font-size:.82rem;margin:0 0 10px}
+  label.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);
+    border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s;background:var(--card)}
+  label.opt:hover{border-color:var(--accent);background:var(--soft)}
+  label.opt input{margin-top:3px;flex:0 0 auto}
+  .opt .t{font-weight:600;font-size:.92rem}
+  .opt .d{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .chk{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border:1px solid var(--line);
+    border-radius:9px;margin:0 8px 8px 0;cursor:pointer;font-size:.88rem;background:var(--card)}
+  .chk:hover{border-color:var(--accent)}
+  .chk input{margin:0}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .field label{font-size:.85rem;font-weight:600}
+  .field input[type=text],select{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:.95rem;background:#fff}
+  .row2{display:flex;gap:12px}.row2 .field{flex:1}
+  #drop{border:2px dashed var(--line);border-radius:12px;padding:34px 16px;text-align:center;color:var(--muted);
+    cursor:pointer;transition:.15s;background:var(--soft)}
+  #drop.hot{border-color:var(--accent);background:#eef4fa;color:var(--accent-d)}
   #drop strong{color:var(--ink)}
-  .btn{
-    background:var(--accent); color:#fff; border:none; padding:13px 22px; border-radius:11px;
-    font-size:1rem; font-weight:650; cursor:pointer; width:100%; transition:.15s;
-  }
-  .btn:hover{background:var(--accent-d)}
-  .btn:disabled{background:#c9cdd2; cursor:not-allowed}
-  .hint{font-size:.82rem; color:var(--muted); margin-top:10px}
-  .swatch{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin-right:5px}
-  .status{margin-top:14px; padding:12px 14px; border-radius:10px; font-size:.9rem; display:none}
-  .status.ok{display:block; background:#eaf5ea; color:#205a23; border:1px solid #bfe0bf}
-  .status.err{display:block; background:#fbeaea; color:#9c2020; border:1px solid #e6bcbc}
-  .status.info{display:block; background:#eef4fa; color:var(--accent-d); border:1px solid #c7ddef}
-  .preview-tog{font-size:.85rem; color:var(--accent); cursor:pointer; user-select:none; margin-top:12px; display:inline-block}
-  #preview{margin-top:12px; font-size:.8rem; max-height:300px; overflow:auto; border:1px solid var(--line); border-radius:9px}
-  #preview table{border-collapse:collapse; width:100%}
-  #preview th,#preview td{border:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top}
-  #preview th{background:var(--soft); position:sticky; top:0}
-  .g-txt{color:var(--green)} .r-txt{color:var(--red)}
-  .filechip{margin-top:10px; font-size:.85rem; color:var(--ink); display:none}
-  .filechip.show{display:block}
+  .btn{background:var(--accent);color:#fff;border:none;padding:13px 22px;border-radius:11px;font-size:1rem;
+    font-weight:650;cursor:pointer;width:100%;transition:.15s}
+  .btn:hover{background:var(--accent-d)}.btn:disabled{background:#c9cdd2;cursor:not-allowed}
+  .btn.sec{background:#fff;color:var(--accent);border:1px solid var(--accent);width:auto;padding:8px 14px;font-size:.85rem}
+  .btn.sec:hover{background:var(--soft)}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:10px}
+  .status{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.9rem;display:none}
+  .status.ok{display:block;background:#eaf5ea;color:#205a23;border:1px solid #bfe0bf}
+  .status.err{display:block;background:#fbeaea;color:#9c2020;border:1px solid #e6bcbc}
+  .status.info{display:block;background:#eef4fa;color:var(--accent-d);border:1px solid #c7ddef}
+  .hidden{display:none}
+  #preview{margin-top:12px;font-size:.78rem;max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:9px}
+  #preview table{border-collapse:collapse;width:100%}
+  #preview th,#preview td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+  #preview th{background:var(--soft);position:sticky;top:0}
+  .map-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .map-row .swatch{width:15px;height:15px;border-radius:4px;flex:0 0 auto;border:1px solid rgba(0,0,0,.15)}
+  .map-row .name{width:70px;font-size:.88rem;font-weight:600}
+  .map-row select{flex:1;max-width:220px}
+  .lvl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .lvl-row .drag{cursor:grab;color:var(--muted);font-size:1.1rem}
+  .lvl-row input{flex:1}
+  .lvl-row .lvlnum{font-size:.8rem;color:var(--muted);width:52px;flex:0 0 auto}
+  .dash{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:10px}
+  .dash .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+  .dash .stat{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .dash .stat .n{font-size:1.35rem;font-weight:700}
+  .dash .stat .l{font-size:.76rem;color:var(--muted)}
+  .toc-item{padding:3px 0;font-size:.87rem}
+  .toc-l1{font-weight:700;margin-top:6px}
+  .toc-l2{padding-left:20px}.toc-l3{padding-left:40px}.toc-l4{padding-left:60px}
+  .warn{color:#b8860b}
+  .vlist{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;white-space:pre-wrap;
+    background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px;margin-top:8px}
+  .mini{font-size:.8rem;color:var(--muted)}
+  .pill{display:inline-block;font-size:.7rem;padding:1px 7px;border-radius:20px;background:var(--soft);color:var(--muted);margin-left:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Script → PPD Converter</h1>
-  <p class="sub">Drop a color-coded Script (.docx) and download a finished PPD table. Your text is never altered.</p>
+  <p class="sub">Upload a coded script (.docx). It auto-detects the course &amp; week, lets you tune the layout, previews the result, and downloads a finished PPD table. Your text is never altered.</p>
 
-  <!-- STEP 1 -->
+  <!-- STEP 1: UPLOAD (now first) -->
   <div class="card">
-    <div class="step-head"><span class="step-num">1</span>Course info <span style="font-weight:400;color:var(--muted);margin-left:6px;font-size:.85rem">(goes in Videos column)</span></div>
+    <div class="step-head"><span class="step-num">1</span>Upload your script</div>
+    <div id="drop"><strong>Click to choose</strong> or drag a <strong>.docx</strong> here
+      <input type="file" id="file" accept=".docx" hidden></div>
+    <div class="hint" id="filechip"></div>
+  </div>
+
+  <!-- STEP 2: COURSE INFO (auto-filled, editable) -->
+  <div class="card hidden" id="courseCard">
+    <div class="step-head"><span class="step-num">2</span>Course &amp; week
+      <span class="pill" id="detectPill">auto-detected</span></div>
     <div class="row2">
-      <div class="field">
-        <label for="course">Course code</label>
-        <input type="text" id="course" placeholder="e.g. ABC123_S1" value="">
+      <div class="field"><label for="course">Course code</label>
+        <input type="text" id="course" placeholder="e.g. LAW607" value=""></div>
+      <div class="field" style="max-width:150px"><label for="week">Week #</label>
+        <input type="text" id="week" placeholder="e.g. 1" value=""></div>
+    </div>
+    <div class="hint">Video label: <strong><span id="vidlabel">…</span></strong>. Edit either field if the detection isn't right.</div>
+  </div>
+
+  <!-- STEP 3: SETTINGS + PREVIEW -->
+  <div class="card hidden" id="settingsCard">
+    <div class="step-head"><span class="step-num">3</span>PPD settings</div>
+
+    <!-- 3.1 Font -->
+    <div class="setting">
+      <h4>Font in PPD</h4>
+      <p class="instr">How should text be rendered in the output?</p>
+      <label class="opt"><input type="radio" name="font" value="keep" checked>
+        <span><span class="t">Keep the script's exact font</span><span class="d">Recommended for LAW courses — preserves the original typeface per run.</span></span></label>
+      <label class="opt"><input type="radio" name="font" value="convert">
+        <span><span class="t">Convert everything to one font</span>
+          <span class="d">Choose below.</span></span></label>
+      <div class="field" id="fontPick" style="max-width:260px;margin-top:6px">
+        <select id="fontChoice">
+          <option>Arial</option><option>Aptos</option><option>Calibri</option>
+          <option>Times New Roman</option><option>Georgia</option><option>Verdana</option><option>Helvetica</option>
+        </select>
       </div>
-      <div class="field" style="max-width:140px">
-        <label for="week">Week #</label>
-        <input type="text" id="week" placeholder="e.g. 1" value="">
+    </div>
+
+    <!-- 3.2 Format cleaner -->
+    <div class="setting">
+      <h4>Format cleaner</h4>
+      <p class="instr">Select any formatting you want removed from the PPD. Highlights are always kept (they mark the correct PlayPosit answer).</p>
+      <div id="cleanBox">
+        <label class="chk"><input type="checkbox" id="clean_all"> All</label>
+        <label class="chk"><input type="checkbox" class="clean" value="bold"> Bold</label>
+        <label class="chk"><input type="checkbox" class="clean" value="italic"> Italic</label>
+        <label class="chk"><input type="checkbox" class="clean" value="underline"> Underline</label>
+        <label class="chk"><input type="checkbox" class="clean" value="strike"> Strikethrough</label>
       </div>
     </div>
-    <div class="hint">Result label: <strong><span id="vidlabel">(enter a course code)</span></strong>. The tool tries to auto-fill the course code and week from your script &mdash; edit if needed.</div>
-  </div>
 
-  <!-- STEP 2 -->
-  <div class="card">
-    <div class="step-head"><span class="step-num">2</span>Where should GREEN text go?</div>
-    <label class="opt">
-      <input type="radio" name="green" value="both" checked>
-      <span><span class="t">Graphics + keep in Script</span><span class="d">Green stays in the Script column AND is copied to Graphics. Matches your manual Week 1.</span></span>
-    </label>
-    <label class="opt">
-      <input type="radio" name="green" value="graphics">
-      <span><span class="t">Graphics only (remove from Script)</span><span class="d">Green moves out of the Script column entirely. Matches the written color code.</span></span>
-    </label>
-    <div class="hint" style="margin-top:4px">
-      In Graphics, green is prefixed <span class="g-txt"><strong>Prof.'s Graphic Notes:</strong></span> and red is prefixed <span class="r-txt"><strong>Prof.'s Production Notes:</strong></span> — colors preserved. Red always stays only in Graphics.
+    <!-- 3.3 One sentence per line -->
+    <div class="setting">
+      <h4>One sentence per line</h4>
+      <p class="instr">In the Script column, start each sentence on a new line (a sentence ends at . ? or !).</p>
+      <label class="chk"><input type="checkbox" id="onePerLine"> Split sentences onto new lines</label>
+    </div>
+
+    <!-- 3.4 Coding mode -->
+    <div class="setting">
+      <h4>Coding in the script</h4>
+      <p class="instr">How did the FD mark up the script?</p>
+      <label class="opt"><input type="radio" name="coding" value="color" checked>
+        <span><span class="t">Color coding</span><span class="d">Different text colors signal different destinations.</span></span></label>
+      <label class="opt"><input type="radio" name="coding" value="format">
+        <span><span class="t">Format coding (accessibility)</span><span class="d">We used formatting (e.g. underline) instead of color to improve accessibility.</span></span></label>
+
+      <div id="colorMap" style="margin-top:10px">
+        <p class="mini">Detected colors → destination (change any if needed):</p>
+        <div id="colorMapRows"></div>
+      </div>
+      <div id="formatMap" class="hidden" style="margin-top:10px">
+        <p class="mini">Formatting → destination:</p>
+        <div id="formatMapRows"></div>
+      </div>
+      <p class="hint">Any content marked as <strong>Animation</strong> goes into the Graphics column (and is counted as an animation). <strong>FD Notes</strong> go into the Video column tagged <em>[FD Notes: …]</em>.</p>
+    </div>
+
+    <!-- 3.4b Graphics duplication -->
+    <div class="setting">
+      <h4>Graphic text in the Script column</h4>
+      <p class="instr">Applies to green text and anything mapped to Graphics/Animation.</p>
+      <label class="opt"><input type="radio" name="graphicDup" value="extract" checked>
+        <span><span class="t">Extract to Graphics only</span><span class="d">Graphic text is removed from the Script column.</span></span></label>
+      <label class="opt"><input type="radio" name="graphicDup" value="both">
+        <span><span class="t">Keep in both Script and Graphics</span><span class="d">All graphic text appears in the Script column as well as Graphics.</span></span></label>
+    </div>
+
+    <!-- 3.5 Heading system -->
+    <div class="setting">
+      <h4>Heading system</h4>
+      <p class="instr">Name your heading levels (top = highest). Two levels by default; add or remove as needed.</p>
+      <div id="levelRows"></div>
+      <button class="btn sec" id="addLevel">+ Add level</button>
+      <p class="instr" style="margin-top:12px">Heading <strong>titles</strong> always appear in Graphics + Script. Choose where the heading <strong>number</strong> (e.g. "Week 1") goes:</p>
+      <div>
+        <label class="chk"><input type="radio" name="headingPlace" value="videoonly" checked> Number in the Video column only <span class="mini">(recommended — evergreen)</span></label>
+        <label class="chk"><input type="radio" name="headingPlace" value="content"> Number in the Script column (with the title)</label>
+      </div>
+    </div>
+
+    <!-- 3.6 Cell styling -->
+    <div class="setting">
+      <h4>Cell background &amp; text color</h4>
+      <p class="instr">Choose how each column's cells look. Yellow highlight is never removed.</p>
+      <div class="map-row"><span class="name">Video</span>
+        <select id="style_video">
+          <option value="tint">Light blue background, black text</option>
+          <option value="white">White background, keep original colors</option>
+        </select></div>
+      <div class="map-row"><span class="name">Graphics</span>
+        <select id="style_graphic">
+          <option value="tint">Light green background, black text</option>
+          <option value="white">White background, keep original colors</option>
+        </select></div>
+      <div class="map-row"><span class="name">Script</span>
+        <select id="style_script">
+          <option value="white">White background, keep original colors</option>
+          <option value="tint">Light green background, black text</option>
+        </select></div>
+      <div class="map-row"><span class="name">PlayPosit</span>
+        <select id="style_pp">
+          <option value="tint">Light orange background, black text</option>
+          <option value="white">White background, keep original colors</option>
+        </select></div>
+    </div>
+
+    <!-- preview -->
+    <div class="setting">
+      <h4>Preview</h4>
+      <div id="preview"></div>
     </div>
   </div>
 
-  <!-- STEP 3 -->
-  <div class="card">
-    <div class="step-head"><span class="step-num">3</span>Upload Script</div>
-    <div id="drop">
-      <strong>Click to choose</strong> or drag a <strong>.docx</strong> here
-      <input type="file" id="file" accept=".docx" hidden>
-    </div>
-    <div class="filechip" id="filechip"></div>
-    <div class="preview-tog" id="ptog" style="display:none">▸ Show parsed preview</div>
-    <div id="preview" style="display:none"></div>
+  <!-- STEP 4: SUMMARY -->
+  <div class="card hidden" id="summaryCard">
+    <div class="step-head"><span class="step-num">4</span>Summary</div>
+    <div id="dashboard"></div>
   </div>
 
-  <!-- STEP 4 -->
-  <div class="card">
-    <div class="step-head"><span class="step-num">4</span>Generate PPD</div>
-    <button class="btn" id="go" disabled>Convert &amp; Download .docx</button>
+  <!-- STEP 5: GENERATE -->
+  <div class="card hidden" id="genCard">
+    <div class="step-head"><span class="step-num">5</span>Generate PPD</div>
+    <button class="btn" id="go">Convert &amp; Download .docx</button>
     <div class="status" id="status"></div>
     <div class="hint">Header rows (Team / ID / VP…) are left blank for you to fill after download.</div>
   </div>
 </div>
 
-<!-- Libraries from CDN: JSZip reads the .docx, docx.js writes the new one -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 <script>
-// Fallback: if the primary docx CDN failed, load an alternate before anything runs.
-(function(){
-  if(!(window.docx && window.docx.Document)){
-    document.write('<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/script>');
-  }
-})();
+(function(){ if(!(window.docx && window.docx.Document)){
+  document.write('<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/script>'); }})();
 </script>
-<script>
-/* ---------- color classification ---------- */
-// Word stores run color as hex in <w:color w:val="RRGGBB"/>. We bucket into black/green/red.
-function classify(hex){
+<script id="appcode">
+/* ============================================================
+   Script → PPD Converter — application logic (v10)
+   Destinations: graphic | video | script | playposit  (+ animation counts to graphic, fdnotes tags into video)
+   ============================================================ */
+
+const WPM = 130;                 // teleprompter words-per-minute
+const SEG_WARN_MIN = 15;         // ToC warning threshold (minutes)
+
+/* ---------- color classification into named buckets ---------- */
+function classifyColor(hex){
   if(!hex || hex==='auto') return 'black';
   hex = hex.toUpperCase();
-  const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+  const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
   if(isNaN(r)) return 'black';
-  // Blue (PlayPosit): blue channel dominant. Check FIRST — cyan-blue (e.g. 0F9ED5) also has a high green channel.
-  if(b > r+30 && b > 110 && r < 160) return 'blue';
-  // Green: green channel clearly dominant
-  if(g > r+25 && g > b+25 && g > 80) return 'green';
-  // Red: red channel clearly dominant
-  if(r > g+40 && r > b+40 && r > 100) return 'red';
+  const mx=Math.max(r,g,b), mn=Math.min(r,g,b);
+  // near-grey / near-black -> black
+  if(mx-mn < 24) return 'black';
+  // purple: red & blue high, green low
+  if(r>90 && b>90 && g+30 < Math.min(r,b) && Math.abs(r-b)<90) return 'purple';
+  // pink/magenta: red high, blue moderate-high, green low, red>=blue
+  if(r>150 && b>70 && g+40<r && r>=b) return 'pink';
+  // blue (incl cyan-blue): blue dominant
+  if(b>r+30 && b>110 && r<170) return 'blue';
+  // green
+  if(g>r+25 && g>b+25 && g>80) return 'green';
+  // red
+  if(r>g+40 && r>b+40 && r>100) return 'red';
   return 'black';
 }
+
+/* hex swatches for UI */
+const COLOR_HEX = {green:'#4EA72E',blue:'#0F9ED5',red:'#C00000',pink:'#E83E8C',purple:'#7048B6'};
+const DEST_LABEL = {graphic:'Graphic',video:'Video',script:'Script',playposit:'PlayPosit',fdnotes:"FD's Notes",animation:'Animation'};
+/* default color -> destination */
+const DEFAULT_COLOR_DEST = {green:'graphic',blue:'video',red:'playposit',pink:'animation',purple:'fdnotes'};
+/* default format -> destination */
+const DEFAULT_FORMAT_DEST = {underline:'graphic',bold:'playposit',italic:'fdnotes'};
 
 /* ---------- parse .docx ---------- */
 async function parseDocx(arrayBuffer){
   const zip = await JSZip.loadAsync(arrayBuffer);
   const xmlText = await zip.file('word/document.xml').async('string');
-  const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const xml = new DOMParser().parseFromString(xmlText,'application/xml');
   const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
 
-  // --- read numbering definitions (numId -> level0 format) so we can reproduce auto-list markers ---
-  let numFmt = {}; // numId -> {fmt, text}
+  // --- detect the script's default font (docDefaults / Normal style) so "keep font" mode inherits it ---
+  let docDefaultFont = null;
+  try{
+    const stFile = zip.file('word/styles.xml');
+    if(stFile){
+      const st = new DOMParser().parseFromString(await stFile.async('string'),'application/xml');
+      // docDefaults
+      const dd = st.getElementsByTagNameNS(W,'docDefaults')[0];
+      if(dd){ const rf = dd.getElementsByTagNameNS(W,'rFonts')[0];
+        if(rf) docDefaultFont = rf.getAttribute('w:ascii')||rf.getAttributeNS(W,'ascii')||rf.getAttribute('w:hAnsi')||rf.getAttributeNS(W,'hAnsi'); }
+      // Normal style overrides docDefaults if present
+      for(const s of st.getElementsByTagNameNS(W,'style')){
+        const sid = s.getAttribute('w:styleId')||s.getAttributeNS(W,'styleId');
+        if(sid && /normal/i.test(sid)){ const rf=s.getElementsByTagNameNS(W,'rFonts')[0];
+          if(rf){ const f=rf.getAttribute('w:ascii')||rf.getAttributeNS(W,'ascii'); if(f) docDefaultFont=f; } break; }
+      }
+    }
+  }catch(e){}
+
+  // numbering defs
+  let numFmt = {}; // numId -> { ilvl -> {fmt,text} }
   try{
     const numFile = zip.file('word/numbering.xml');
     if(numFile){
       const numXml = new DOMParser().parseFromString(await numFile.async('string'),'application/xml');
-      // numId -> abstractNumId
-      const n2a = {};
+      const n2a={};
       for(const n of numXml.getElementsByTagNameNS(W,'num')){
-        const nid = n.getAttribute('w:numId') || n.getAttributeNS(W,'numId');
-        const a = n.getElementsByTagNameNS(W,'abstractNumId')[0];
-        if(a) n2a[nid] = a.getAttribute('w:val') || a.getAttributeNS(W,'val');
+        const nid=n.getAttribute('w:numId')||n.getAttributeNS(W,'numId');
+        const a=n.getElementsByTagNameNS(W,'abstractNumId')[0];
+        if(a) n2a[nid]=a.getAttribute('w:val')||a.getAttributeNS(W,'val');
       }
-      // abstractNumId -> level0 fmt/text
-      const a2f = {};
+      const a2f={};
       for(const an of numXml.getElementsByTagNameNS(W,'abstractNum')){
-        const aid = an.getAttribute('w:abstractNumId') || an.getAttributeNS(W,'abstractNumId');
+        const aid=an.getAttribute('w:abstractNumId')||an.getAttributeNS(W,'abstractNumId');
+        const levels={};
         for(const lvl of an.getElementsByTagNameNS(W,'lvl')){
-          const il = lvl.getAttribute('w:ilvl') || lvl.getAttributeNS(W,'ilvl');
-          if(il==='0'){
-            const f = lvl.getElementsByTagNameNS(W,'numFmt')[0];
-            const t = lvl.getElementsByTagNameNS(W,'lvlText')[0];
-            a2f[aid] = {fmt:(f?(f.getAttribute('w:val')||f.getAttributeNS(W,'val')):'decimal'),
-                        text:(t?(t.getAttribute('w:val')||t.getAttributeNS(W,'val')):'%1.')};
-            break;
-          }
+          const il=lvl.getAttribute('w:ilvl')||lvl.getAttributeNS(W,'ilvl');
+          const f=lvl.getElementsByTagNameNS(W,'numFmt')[0];
+          const t=lvl.getElementsByTagNameNS(W,'lvlText')[0];
+          levels[il]={fmt:(f?(f.getAttribute('w:val')||f.getAttributeNS(W,'val')):'decimal'),
+                      text:(t?(t.getAttribute('w:val')||t.getAttributeNS(W,'val')):'%1.')};
         }
+        a2f[aid]=levels;
       }
-      for(const nid in n2a) numFmt[nid] = a2f[n2a[nid]] || {fmt:'decimal',text:'%1.'};
+      for(const nid in n2a) numFmt[nid]=a2f[n2a[nid]]||{'0':{fmt:'decimal',text:'%1.'}};
     }
-  }catch(e){ /* no numbering — fine */ }
+  }catch(e){}
 
-  function marker(def, n){
-    const fmt = def.fmt, text = def.text || '%1.';
+  function marker(def,n){
+    const fmt=def.fmt, text=def.text||'%1.';
     if(fmt==='bullet'){
-      // lvlText holds a symbol-font glyph; map common Wingdings/Symbol codepoints to real bullets
-      const g = text;
-      if(g==='\uF0B7' || g==='\u00B7') return '\u2022';      // ● solid bullet
-      if(g==='o' || g==='\uF06F') return '\u25CB';            // ○ hollow bullet
-      if(g==='\uF0A7' || g==='\u00A7') return '\u25AA';       // ▪ square
-      if(g==='\u2013' || g==='-') return '\u2013';            // – dash
-      return '\u2022'; // default solid bullet
+      const g=text;
+      if(g==='\uF0B7'||g==='\u00B7') return '\u2022';
+      if(g==='o'||g==='\uF06F') return '\u25CB';
+      if(g==='\uF0A7'||g==='\u00A7') return '\u25AA';
+      if(g==='\u2013'||g==='-') return '\u2013';
+      return '\u2022';
     }
     let sym;
-    if(fmt==='lowerLetter') sym = String.fromCharCode(96+n);
-    else if(fmt==='upperLetter') sym = String.fromCharCode(64+n);
-    else if(fmt==='lowerRoman' || fmt==='upperRoman'){
-      const map=[[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']]; let s='',x=n;
-      for(const [v,symb] of map){ while(x>=v){s+=symb;x-=v;} }
-      sym = fmt==='upperRoman'?s.toUpperCase():s;
-    } else sym = String(n);
-    return text.replace(/%\d+/, sym);
+    if(fmt==='lowerLetter') sym=String.fromCharCode(96+n);
+    else if(fmt==='upperLetter') sym=String.fromCharCode(64+n);
+    else if(fmt==='lowerRoman'||fmt==='upperRoman'){
+      const m=[[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']];let s='',x=n;
+      for(const [v,sy] of m){while(x>=v){s+=sy;x-=v;}}
+      sym=fmt==='upperRoman'?s.toUpperCase():s;
+    } else sym=String(n);
+    return text.replace(/%\d+/,sym);
   }
 
-  const counters = {}; // numId -> current count
-  const paras = [...xml.getElementsByTagNameNS(W,'p')];
-  const out = [];
+  const counters={};
+  const paras=[...xml.getElementsByTagNameNS(W,'p')];
+  const out=[];
+  const styleLevelOf = (styleId)=>{
+    if(!styleId) return null;
+    const m = styleId.match(/heading\s*([1-9])/i) || styleId.match(/Heading([1-9])/);
+    return m ? parseInt(m[1],10) : null;
+  };
 
   for(const p of paras){
-    // detect list membership
-    let listMarker = null, align = null;
-    const pPr = p.getElementsByTagNameNS(W,'pPr')[0];
+    let listMarker=null, align=null, headingLevel=null, outlineLevel=null;
+    const pPr=p.getElementsByTagNameNS(W,'pPr')[0];
     if(pPr){
-      const jc = pPr.getElementsByTagNameNS(W,'jc')[0];
-      if(jc) align = jc.getAttribute('w:val') || jc.getAttributeNS(W,'val'); // center / both / right / left
-      const numPr = pPr.getElementsByTagNameNS(W,'numPr')[0];
+      const jc=pPr.getElementsByTagNameNS(W,'jc')[0];
+      if(jc) align=jc.getAttribute('w:val')||jc.getAttributeNS(W,'val');
+      const pStyle=pPr.getElementsByTagNameNS(W,'pStyle')[0];
+      if(pStyle){ const sv=pStyle.getAttribute('w:val')||pStyle.getAttributeNS(W,'val'); headingLevel=styleLevelOf(sv); }
+      const ol=pPr.getElementsByTagNameNS(W,'outlineLvl')[0];
+      if(ol){ const v=ol.getAttribute('w:val')||ol.getAttributeNS(W,'val'); if(v!=null) outlineLevel=parseInt(v,10)+1; }
+      const numPr=pPr.getElementsByTagNameNS(W,'numPr')[0];
       if(numPr){
-        const ni = numPr.getElementsByTagNameNS(W,'numId')[0];
-        const numId = ni ? (ni.getAttribute('w:val')||ni.getAttributeNS(W,'val')) : null;
+        const ni=numPr.getElementsByTagNameNS(W,'numId')[0];
+        const numId=ni?(ni.getAttribute('w:val')||ni.getAttributeNS(W,'val')):null;
+        const ilEl=numPr.getElementsByTagNameNS(W,'ilvl')[0];
+        const ilvl=ilEl?(ilEl.getAttribute('w:val')||ilEl.getAttributeNS(W,'val')||'0'):'0';
         if(numId){
-          counters[numId] = (counters[numId]||0) + 1;
-          const def = numFmt[numId] || {fmt:'decimal',text:'%1.'};
-          listMarker = marker(def, counters[numId]);
+          const key=numId+':'+ilvl;
+          counters[key]=(counters[key]||0)+1;
+          // reset counters for any deeper levels of this list, so nested lists restart correctly
+          for(const k in counters){ if(k.indexOf(numId+':')===0){ const lv=parseInt(k.split(':')[1],10); if(lv>parseInt(ilvl,10)) counters[k]=0; } }
+          const lvlDef = (numFmt[numId] && numFmt[numId][ilvl]) ? numFmt[numId][ilvl] : {fmt:'decimal',text:'%1.'};
+          listMarker=marker(lvlDef,counters[key]);
         }
       }
     }
-    // gather runs with text + color + formatting, in document order
-    const runs = [];
+    const runs=[];
     for(const r of p.getElementsByTagNameNS(W,'r')){
-      let color = null, highlight = null, bold=false, italic=false, underline=false, font=null, size=null,
-          strike=false, vertAlign=null, underlineStyle=null;
-      const rPr = r.getElementsByTagNameNS(W,'rPr')[0];
+      let color=null,highlight=null,bold=false,italic=false,underline=false,font=null,size=null,strike=false,vertAlign=null,underlineStyle=null;
+      const rPr=r.getElementsByTagNameNS(W,'rPr')[0];
       if(rPr){
-        const c = rPr.getElementsByTagNameNS(W,'color')[0];
-        if(c) color = c.getAttribute('w:val') || c.getAttributeNS(W,'val');
-        const h = rPr.getElementsByTagNameNS(W,'highlight')[0];
-        if(h) highlight = h.getAttribute('w:val') || h.getAttributeNS(W,'val');
-        const bEl = rPr.getElementsByTagNameNS(W,'b')[0];
-        if(bEl){ const v=bEl.getAttribute('w:val')||bEl.getAttributeNS(W,'val'); bold = !(v==='0'||v==='false'); }
-        const iEl = rPr.getElementsByTagNameNS(W,'i')[0];
-        if(iEl){ const v=iEl.getAttribute('w:val')||iEl.getAttributeNS(W,'val'); italic = !(v==='0'||v==='false'); }
-        const uEl = rPr.getElementsByTagNameNS(W,'u')[0];
-        if(uEl){ const v=uEl.getAttribute('w:val')||uEl.getAttributeNS(W,'val'); underline = !(v==='none'||v==='0'); underlineStyle = v||'single'; }
-        // strikethrough (single or double)
-        const sEl = rPr.getElementsByTagNameNS(W,'strike')[0];
-        if(sEl){ const v=sEl.getAttribute('w:val')||sEl.getAttributeNS(W,'val'); strike = !(v==='0'||v==='false'); }
-        const dsEl = rPr.getElementsByTagNameNS(W,'dstrike')[0];
-        if(dsEl){ const v=dsEl.getAttribute('w:val')||dsEl.getAttributeNS(W,'val'); if(!(v==='0'||v==='false')) strike='double'; }
-        // superscript / subscript
-        const vaEl = rPr.getElementsByTagNameNS(W,'vertAlign')[0];
-        if(vaEl){ vertAlign = vaEl.getAttribute('w:val')||vaEl.getAttributeNS(W,'val'); }
-        const rf = rPr.getElementsByTagNameNS(W,'rFonts')[0];
-        if(rf) font = rf.getAttribute('w:ascii')||rf.getAttributeNS(W,'ascii')||rf.getAttribute('w:hAnsi')||rf.getAttributeNS(W,'hAnsi');
-        const sz = rPr.getElementsByTagNameNS(W,'sz')[0];
-        if(sz){ const v=sz.getAttribute('w:val')||sz.getAttributeNS(W,'val'); if(v) size=parseInt(v,10); }
+        const c=rPr.getElementsByTagNameNS(W,'color')[0]; if(c) color=c.getAttribute('w:val')||c.getAttributeNS(W,'val');
+        const h=rPr.getElementsByTagNameNS(W,'highlight')[0]; if(h) highlight=h.getAttribute('w:val')||h.getAttributeNS(W,'val');
+        const bEl=rPr.getElementsByTagNameNS(W,'b')[0]; if(bEl){const v=bEl.getAttribute('w:val')||bEl.getAttributeNS(W,'val'); bold=!(v==='0'||v==='false');}
+        const iEl=rPr.getElementsByTagNameNS(W,'i')[0]; if(iEl){const v=iEl.getAttribute('w:val')||iEl.getAttributeNS(W,'val'); italic=!(v==='0'||v==='false');}
+        const uEl=rPr.getElementsByTagNameNS(W,'u')[0]; if(uEl){const v=uEl.getAttribute('w:val')||uEl.getAttributeNS(W,'val'); underline=!(v==='none'||v==='0'); underlineStyle=v||'single';}
+        const sEl=rPr.getElementsByTagNameNS(W,'strike')[0]; if(sEl){const v=sEl.getAttribute('w:val')||sEl.getAttributeNS(W,'val'); strike=!(v==='0'||v==='false');}
+        const dsEl=rPr.getElementsByTagNameNS(W,'dstrike')[0]; if(dsEl){const v=dsEl.getAttribute('w:val')||dsEl.getAttributeNS(W,'val'); if(!(v==='0'||v==='false')) strike='double';}
+        const vaEl=rPr.getElementsByTagNameNS(W,'vertAlign')[0]; if(vaEl) vertAlign=vaEl.getAttribute('w:val')||vaEl.getAttributeNS(W,'val');
+        const rf=rPr.getElementsByTagNameNS(W,'rFonts')[0]; if(rf) font=rf.getAttribute('w:ascii')||rf.getAttributeNS(W,'ascii')||rf.getAttribute('w:hAnsi')||rf.getAttributeNS(W,'hAnsi');
+        const sz=rPr.getElementsByTagNameNS(W,'sz')[0]; if(sz){const v=sz.getAttribute('w:val')||sz.getAttributeNS(W,'val'); if(v) size=parseInt(v,10);}
       }
-      let txt = '';
-      // walk children in order so a leading <w:tab/> stays before the text
+      let txt='';
       for(const child of r.childNodes){
         if(child.nodeType!==1) continue;
-        const ln = child.localName;
-        if(ln==='t') txt += child.textContent;
-        else if(ln==='tab') txt += '\t';
-        else if(ln==='br' || ln==='cr') txt += '\n';
+        const ln=child.localName;
+        if(ln==='t') txt+=child.textContent;
+        else if(ln==='tab') txt+='\t';
+        else if(ln==='br'||ln==='cr') txt+='\n';
       }
-      if(txt.length) runs.push({txt, cls: classify(color), highlight, bold, italic, underline, underlineStyle, font, size, strike, vertAlign});
+      if(txt.length) runs.push({txt,color:(color||null),cls:classifyColor(color),highlight,bold,italic,underline,underlineStyle,font,size,strike,vertAlign});
     }
-    // FIX #2: when an "Exercise #...:" header is immediately followed by a tab, replace ONLY that tab
-    // with a space. The tab is often the start of the NEXT run, so handle across run boundaries.
+    // Exercise-tab fix
     {
-      const joined = runs.map(x=>x.txt).join('');
-      const m = joined.match(/^(\s*Exercise\s*#[^:]*:)\t/);
-      if(m){
-        // walk runs, find the tab at character index m[1].length and turn it into a space
-        let idx = 0; const target = m[1].length;
-        for(const rr of runs){
-          for(let k=0;k<rr.txt.length;k++){
-            if(idx===target && rr.txt[k]==='\t'){
-              rr.txt = rr.txt.slice(0,k) + ' ' + rr.txt.slice(k+1);
-            }
-            idx++;
-          }
-        }
-      }
+      const joined=runs.map(x=>x.txt).join('');
+      const m=joined.match(/^(\s*Exercise\s*#[^:]*:)\t/);
+      if(m){ let idx=0;const target=m[1].length;
+        for(const rr of runs){ for(let k=0;k<rr.txt.length;k++){ if(idx===target&&rr.txt[k]==='\t'){rr.txt=rr.txt.slice(0,k)+' '+rr.txt.slice(k+1);} idx++; } } }
     }
-    const full = runs.map(x=>x.txt).join('');
-    if(!full.trim()) { out.push({full:'', runs:[], blank:true, listMarker:null, align:null}); continue; }
-    out.push({full, runs, blank:false, listMarker, align});
+    const full=runs.map(x=>x.txt).join('');
+    if(!full.trim()){ out.push({full:'',runs:[],blank:true,listMarker:null,align:null,headingLevel:null,outlineLevel:null}); continue; }
+    out.push({full,runs,blank:false,listMarker,align,headingLevel,outlineLevel});
   }
+  // dominant per-run font (fallback if no docDefault)
+  const fontCounts={};
+  out.forEach(p=>p.runs&&p.runs.forEach(r=>{ if(r.font){ fontCounts[r.font]=(fontCounts[r.font]||0)+1; } }));
+  let domFont=null,best=0; for(const f in fontCounts){ if(fontCounts[f]>best){best=fontCounts[f];domFont=f;} }
+  out.scriptFont = docDefaultFont || domFont || null; // the font to use as PPD default in "keep" mode
   return out;
 }
 
-/* ---------- build segments by color from runs ---------- */
-// Each segment = a run of same-class adjacent runs. Keeps the individual formatted
-// runs inside `.runs` so bold/italic/underline/font survive. `.txt` is the concatenation.
+/* ---------- detect the set of colors present ---------- */
+function detectColors(paras){
+  const set=new Set();
+  for(const p of paras){ if(p.blank) continue;
+    for(const r of p.runs){ if(r.cls!=='black') set.add(r.cls); } }
+  return [...set];
+}
+/* ---------- detect formats present (for format-coding mode) ---------- */
+function detectFormats(paras){
+  const set=new Set();
+  for(const p of paras){ if(p.blank) continue;
+    for(const r of p.runs){ if(r.underline) set.add('underline'); if(r.bold) set.add('bold'); if(r.italic) set.add('italic'); } }
+  return [...set];
+}
+
+/* ---------- heading detection ---------- */
+// Returns {level, title} or null. Uses explicit "Week/Module/Section/Part #" first, then Word heading styles.
+function detectHeading(para, levelTerms){
+  const t=para.full.trim();
+  // explicit term match e.g. "Module #1: Title", "Section #2 Foo", "Week #12: Bar"
+  for(let i=0;i<levelTerms.length;i++){
+    const term=levelTerms[i].trim(); if(!term) continue;
+    const re=new RegExp('^'+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*#?\\s*([\\w.]+)?\\s*[:\\-\u2013]?\\s*(.*)$','i');
+    const m=t.match(re);
+    if(m){ return {level:i+1, num:(m[1]||'').trim(), title:(m[2]||'').trim()||t}; }
+  }
+  // Week always level 1 fallback
+  const wm=t.match(/^week\s*#?\s*([\w.]+)\s*[:\-\u2013]?\s*(.*)$/i);
+  if(wm) return {level:1,num:(wm[1]||'').trim(),title:(wm[2]||'').trim()||t};
+  // Word heading style
+  if(para.headingLevel) return {level:para.headingLevel,num:'',title:t};
+  if(para.outlineLevel) return {level:para.outlineLevel,num:'',title:t};
+  return null;
+}
+
+/* ---------- segments by color ---------- */
 function segmentsByColor(runs){
-  const segs = [];
+  const segs=[];
   for(const r of runs){
-    const prev = segs[segs.length-1];
-    if(prev && prev.cls===r.cls){
-      prev.txt += r.txt;
-      prev.runs.push(r);
-      if(r.highlight) prev.highlight = r.highlight; // remember any highlight in the segment
-    } else {
-      segs.push({cls:r.cls, txt:r.txt, highlight:r.highlight||null, runs:[r]});
-    }
+    const prev=segs[segs.length-1];
+    if(prev && prev.cls===r.cls){ prev.txt+=r.txt; prev.runs.push(r); if(r.highlight) prev.highlight=r.highlight; }
+    else segs.push({cls:r.cls,txt:r.txt,highlight:r.highlight||null,runs:[r]});
+  }
+  return segs;
+}
+/* ---------- segments by format signal (format-coding mode) ---------- */
+// A run's "signal" is the first active format among underline/bold/italic, else 'plain'
+function formatSignal(r, activeSet){
+  if(activeSet.has('underline') && r.underline) return 'underline';
+  if(activeSet.has('bold') && r.bold) return 'bold';
+  if(activeSet.has('italic') && r.italic) return 'italic';
+  return 'plain';
+}
+function segmentsByFormat(runs, activeSet){
+  const segs=[];
+  for(const r of runs){
+    const sig=formatSignal(r,activeSet);
+    const prev=segs[segs.length-1];
+    if(prev && prev.sig===sig){ prev.txt+=r.txt; prev.runs.push(r); if(r.highlight) prev.highlight=r.highlight; }
+    else segs.push({sig,txt:r.txt,highlight:r.highlight||null,runs:[r]});
   }
   return segs;
 }
 
-/* ---------- detect headers ---------- */
-function headerKind(text){
-  const t = text.trim();
-  if(/^module\s*#?\s*\d+/i.test(t)) return 'module';
-  if(/^week\s*#?\s*\d+/i.test(t)) return 'week';
-  return null;
-}
-function weekNumFrom(text){
-  const m = text.match(/week\s*#?\s*(\d+)/i); return m ? m[1] : null;
-}
-function moduleNumFrom(text){
-  const m = text.match(/module\s*#?\s*(\d+)/i); return m ? m[1] : null;
-}
+/* ============================================================
+   buildRows — the core routing, now config-driven
+   config = {
+     coding:'color'|'format',
+     colorDest:{green:'graphic',...}, formatDest:{underline:'graphic',...},
+     levelTerms:[...], headingPlace:'content'|'videoonly',
+     onePerLine:bool
+   }
+   Each row: {type, video:[segs], graphics:[segs], script:[segs], playposit:[segs], heading?, level?}
+   Segment: {dest, txt, runs, highlight, lineStart, align, markerText, prefix, animation?}
+   ============================================================ */
+function fixExerciseTab(txt){ return txt.replace(/^(\s*Exercise\s*#[^:]*:)\t/, '$1 '); }
 
-/* ---------- assemble row model ---------- */
-function buildRows(paras, greenMode){
-  const rows = [];
-  let started = false;
-  let blueBuffer = [];
-  let greenBuffer = [];
-
-  function isAllOf(para, cls){
-    const segs = segmentsByColor(para.runs);
-    return segs.length>0 && segs.every(s=>s.cls===cls);
-  }
-  function fixExerciseTab(txt){
-    return txt.replace(/^(\s*Exercise\s*#[^:]*:)\t/, '$1 ');
-  }
-  // turn a paragraph's same-color segments into line-segments, prepending the list marker (in color)
-  function paraSegs(para, cls){
-    const segs = segmentsByColor(para.runs).filter(s=>s.cls===cls);
-    const marker = para.listMarker ? para.listMarker + '\t' : '';
-    return segs.map((s,j)=>({
-      cls, txt:(j===0?marker:'')+s.txt, runs:s.runs, highlight:s.highlight,
-      lineStart:(j===0), align:para.align||null,
-      // marker is its own colored run prefix (not part of source runs)
-      markerText:(j===0?marker:'')
-    }));
-  }
-  function flushBlue(){
-    if(!blueBuffer.length) return;
-    const ppSegs = [];
-    blueBuffer.forEach((para)=>{
-      paraSegs(para,'blue').forEach(seg=>{ seg.txt = fixExerciseTab(seg.txt); ppSegs.push(seg); });
+function splitSentences(segs){
+  // Split each segment's runs so a sentence-ending run boundary starts a new line.
+  // We operate at the text level but keep run formatting by slicing runs.
+  const out=[];
+  segs.forEach(seg=>{
+    // flatten runs into char stream with run refs
+    let lineRuns=[]; let started=seg.lineStart;
+    const pushLine=(ls)=>{ if(lineRuns.length){ out.push({...seg, runs:lineRuns, txt:lineRuns.map(r=>r.txt).join(''), lineStart:ls, markerText: (ls&&out.length===0?seg.markerText:'')}); lineRuns=[]; } };
+    let first=true;
+    seg.runs.forEach(r=>{
+      // split this run on sentence-ends, keeping the punctuation with the preceding text
+      const parts=r.txt.split(/(?<=[.?!])\s+/);
+      parts.forEach((part,i)=>{
+        if(i>0){ pushLine(first?seg.lineStart:true); first=false; }
+        if(part.length) lineRuns.push({...r, txt:part + (i<parts.length-1?'':'')});
+      });
     });
-    rows.push({type:'data', video:'', script:[], graphics:[], playposit:ppSegs});
-    blueBuffer = [];
+    pushLine(first?seg.lineStart:true);
+  });
+  return out;
+}
+
+function buildRows(paras, config){
+  const rows=[];
+  const dest = config.coding==='color' ? config.colorDest : null;
+  const fdest = config.coding==='format' ? config.formatDest : null;
+  const activeFmt = fdest ? new Set(Object.keys(fdest)) : new Set();
+
+  // destination buffers for merging consecutive same-destination paragraphs
+  let buffers = {}; // dest -> [{para, segs}]
+  const order = ['graphic','video','script','playposit','animation','fdnotes'];
+
+  // helper: get the destination of a segment
+  function destOfColorSeg(seg){
+    if(seg.cls==='black') return 'script';
+    return dest[seg.cls] || 'graphic';
   }
-  function flushGreen(){
-    if(!greenBuffer.length) return;
-    const gSegs = [];
-    greenBuffer.forEach((para)=> paraSegs(para,'green').forEach(seg=> gSegs.push(seg)));
-    const scriptSegs = (greenMode==='both')
-      ? gSegs.map(s=>({cls:'green', txt:s.txt, runs:s.runs, lineStart:s.lineStart, align:s.align, markerText:s.markerText}))
-      : [];
-    rows.push({type:'data', video:'', script:scriptSegs, graphics:gSegs, playposit:[]});
-    greenBuffer = [];
+  function destOfFormatSeg(seg){
+    if(seg.sig==='plain') return 'script';
+    return fdest[seg.sig] || 'graphic';
   }
-  function flushAll(){ flushBlue(); flushGreen(); }
+
+  // Convert a paragraph into a list of {dest, segs:[segObj]} groups, preserving marker/align.
+  function paraToGroups(para){
+    const segs = config.coding==='color' ? segmentsByColor(para.runs) : segmentsByFormat(para.runs, activeFmt);
+    const marker = para.listMarker ? para.listMarker + '\t' : '';
+    const groups=[]; let firstDestFirst={};
+    segs.forEach((s,idx)=>{
+      const d = config.coding==='color' ? destOfColorSeg(s) : destOfFormatSeg(s);
+      const isFirstOfDest = !firstDestFirst[d]; firstDestFirst[d]=true;
+      const mk = (isFirstOfDest && marker) ? marker : '';
+      groups.push({ dest:d, seg:{
+        dest:d, txt: mk + s.txt, runs:s.runs, highlight:s.highlight||null,
+        align: para.align||null, markerText: mk, lineStart:true
+      }});
+    });
+    return groups;
+  }
+
+  // Determine if a paragraph is "pure" one destination (for merge grouping)
+  function pureDest(para){
+    const g=paraToGroups(para);
+    if(!g.length) return null;
+    const d=g[0].dest;
+    return g.every(x=>x.dest===d) ? d : null;
+  }
+
+  let mergeBuf={dest:null,segs:[]};
+  function flushMerge(){
+    if(!mergeBuf.dest || !mergeBuf.segs.length){ mergeBuf={dest:null,segs:[]}; return; }
+    const d=mergeBuf.dest;
+    const row=emptyRow('data');
+    placeSegs(row, d, mergeBuf.segs);
+    // pure graphic/animation block: also copy into Script if "keep in both" (each item on its own line)
+    if(config.graphicDup==='both' && (d==='graphic'||d==='animation')){
+      mergeBuf.segs.forEach((s)=>{
+        row.script.push({...s, dest:'script', animation:false, prefix:null, prefixClose:null,
+          lineStart:(row.script.length===0? true : (s.lineStart!==false))});
+      });
+    }
+    rows.push(row);
+    mergeBuf={dest:null,segs:[]};
+  }
+
+  function emptyRow(type){ return {type, heading:null, level:null, video:[],graphics:[],script:[],playposit:[]}; }
+  // place segments into the right column array on a row, applying animation->graphic & fdnotes->video(tag)
+  function placeSegs(row, d, segs){
+    let target, prefix=null, animation=false, stripToScript=false;
+    if(d==='graphic'){ target=row.graphics; }
+    else if(d==='animation'){ target=row.graphics; animation=true; }
+    else if(d==='video'){ target=row.video; }
+    else if(d==='fdnotes'){ target=row.video; prefix="[FD Notes: "; }
+    else if(d==='playposit'){ target=row.playposit; }
+    else { target=row.script; }
+    segs.forEach((s,i)=>{
+      let txt=s.txt;
+      if(prefix && i===0) { /* prefix added at render via seg.prefix */ }
+      target.push({...s, dest:d, animation, prefix:(prefix&&i===0)?prefix:null,
+        prefixClose:(prefix&&i===0)?"]":null,
+        lineStart:(target.length===0? true : s.lineStart)});
+    });
+  }
 
   for(const para of paras){
     if(para.blank) continue;
-    const kind = headerKind(para.full);
 
-    if(kind==='week'){
-      const wn = weekNumFrom(para.full);
-      if(wn){ document.getElementById('week').value = wn; }
+    // headings
+    const h = detectHeading(para, config.levelTerms);
+    if(h){
+      flushMerge();
+      const row=emptyRow('heading'); row.heading=h; row.level=h.level;
+      rows.push(row);
       continue;
     }
-    if(kind==='module'){
-      flushAll();
-      started = true;
-      const mn = moduleNumFrom(para.full);
-      rows.push({type:'module', video:[{cls:'black', txt:'Module '+(mn||''), runs:[{txt:'Module '+(mn||''),bold:true}], lineStart:true}],
-                 script:[{cls:'black', txt:para.full, runs:para.runs, lineStart:true}], graphics:[], playposit:[]});
+    // legend/code lines skip (only before any real content)
+    if(rows.length===0){
+      const tt=para.full.trim();
+      if(/^(black|green|red|blue|pink|purple)\s+text\s*[–-]/i.test(tt)) continue;
+      if(/^code:/i.test(tt)) continue;
+      if(/rebuild scripts/i.test(tt)) continue;
+    }
+
+    const pd=pureDest(para);
+    if(pd){
+      // accumulate consecutive pure-same-dest paragraphs
+      if(mergeBuf.dest && mergeBuf.dest!==pd) flushMerge();
+      mergeBuf.dest=pd;
+      const groups=paraToGroups(para);
+      groups.forEach(g=>{ g.seg.txt=fixExerciseTab(g.seg.txt); mergeBuf.segs.push(g.seg); });
       continue;
     }
-    if(!started){
-      if(/^(black|green|red|blue)\s+text\s*[–-]/i.test(para.full.trim())) continue;
-      if(/^code:/i.test(para.full.trim())) continue;
-      if(/rebuild scripts/i.test(para.full)) continue;
-    }
+    // mixed paragraph: flush merge, emit a single row with each dest placed
+    flushMerge();
+    const row=emptyRow('data');
+    const groups=paraToGroups(para);
+    // Place non-script destinations grouped (graphics/video/pp), preserving their internal order.
+    const byDest={};
+    groups.forEach(g=>{ (byDest[g.dest]=byDest[g.dest]||[]).push(g.seg); });
+    order.forEach(d=>{ if(d!=='script' && byDest[d]){ byDest[d].forEach(s=>s.txt=fixExerciseTab(s.txt)); placeSegs(row,d,byDest[d]); }});
 
-    if(isAllOf(para,'blue')){ flushGreen(); blueBuffer.push(para); continue; }
-    if(isAllOf(para,'green')){ flushBlue(); greenBuffer.push(para); continue; }
-    flushAll();
-
-    // DATA paragraph (mixed/black): split into colored segments, preserve formatting + marker + align
-    const segs = segmentsByColor(para.runs);
-    const scriptSegs = [];
-    const graphicSegs = [];
-    const ppSegs = [];
-    const videoSegs = [];
-    const marker = para.listMarker ? para.listMarker + '\t' : '';
-    let firstScriptSeen = false;
-
-    segs.forEach((s)=>{
-      const common = {runs:s.runs, align:para.align||null};
-      if(s.cls==='green'){
-        graphicSegs.push({cls:'green', txt:s.txt, lineStart:(graphicSegs.length===0), ...common});
-        if(greenMode==='both') scriptSegs.push({cls:'green', txt:s.txt, lineStart:false, ...common});
-      } else if(s.cls==='red'){
-        // RULE 3: red production notes go to VIDEO column, keep the prefix
-        videoSegs.push({cls:'red', txt:s.txt, prefix:"Prof.'s Production Notes: ", lineStart:(videoSegs.length===0), ...common});
-      } else if(s.cls==='blue'){
-        ppSegs.push({cls:'blue', txt:fixExerciseTab(s.txt), highlight:s.highlight, lineStart:(ppSegs.length===0), ...common});
-      } else {
-        // black: first black seg of the paragraph carries the list marker
-        const mk = (!firstScriptSeen && marker) ? marker : '';
-        scriptSegs.push({cls:'black', txt:mk+s.txt, markerText:mk, lineStart:(scriptSegs.length===0), ...common});
-        firstScriptSeen = true;
+    // SCRIPT column: walk segments in ORIGINAL order so inline graphic text stays in place.
+    // - black segments always go to Script.
+    // - graphic/animation segments go to Script only when graphicDup==='both' (in their original spot).
+    // - video/fdnotes/playposit segments never appear in Script.
+    const scriptInline=[];
+    groups.forEach(g=>{
+      const d=g.dest;
+      const s={...g.seg}; s.txt=fixExerciseTab(s.txt);
+      const firstScript=(scriptInline.length===0);
+      if(d==='script'){
+        scriptInline.push({...s, dest:'script', lineStart:firstScript});
+      } else if((d==='graphic'||d==='animation') && config.graphicDup==='both'){
+        scriptInline.push({...s, dest:'script', animation:false, prefix:null, prefixClose:null,
+          markerText:'', lineStart:firstScript});
       }
     });
-    rows.push({type:'data', video:videoSegs, script:scriptSegs, graphics:graphicSegs, playposit:ppSegs});
+    row.script.push(...scriptInline);
+    rows.push(row);
   }
-  flushAll();
+  flushMerge();
+
+  // one-sentence-per-line applies to SCRIPT column only
+  if(config.onePerLine){
+    rows.forEach(row=>{ if(row.script && row.script.length){ row.script=splitSentences(row.script); } });
+  }
   return rows;
 }
 
-/* ---------- render preview ---------- */
-function fmtRun(r, color, stripHL){
-  let t = esc(r.txt||'');
-  if(r.bold) t = `<b>${t}</b>`;
-  if(r.italic) t = `<i>${t}</i>`;
-  if(r.underline) t = `<u>${t}</u>`;
-  if(r.strike) t = `<s>${t}</s>`;
-  if(r.vertAlign==='superscript') t = `<sup>${t}</sup>`;
-  else if(r.vertAlign==='subscript') t = `<sub>${t}</sub>`;
-  const hl = (r.highlight==='yellow' && !stripHL) ? ';background:#fff3a3' : '';
+/* export for Node testing */
+
+/* ============================================================
+   SUMMARY + VIDEO LIST
+   ============================================================ */
+function wordCount(str){ const m=(str||'').trim().match(/\S+/g); return m?m.length:0; }
+function minutesFromWords(w){ return w / WPM; }
+function fmtMin(m){ if(m<1 && m>0) return '<1'; return String(Math.round(m)); }
+
+// Walk rows, compute per-heading script word counts and element counts.
+// Returns {counts, toc:[{level,title,words,minutes,children:[]}], totalWords}
+function summarize(rows){
+  const counts={graphic:0,animation:0,video:0,playposit:0,fdnotes:0};
+  let totalWords=0;
+  // ToC tree built from heading rows; script words accumulate into the current deepest heading path
+  const toc=[]; const stack=[]; // stack of nodes by level
+  function addHeading(level,title){
+    const node={level,title,words:0,minutes:0,children:[]};
+    while(stack.length && stack[stack.length-1].level>=level) stack.pop();
+    if(stack.length) stack[stack.length-1].children.push(node);
+    else toc.push(node);
+    stack.push(node);
+    return node;
+  }
+  rows.forEach(row=>{
+    if(row.type==='heading'){ addHeading(row.level,row.heading.title); return; }
+    // count elements
+    if(row.graphics && row.graphics.length){ counts.graphic++; if(row.graphics.some(s=>s.animation)) counts.animation++; }
+    if(row.video && row.video.length){ if(row.video.some(s=>s.prefix)) counts.fdnotes++; else counts.video++; }
+    if(row.playposit && row.playposit.length) counts.playposit++;
+    // script words -> current heading node(s)
+    if(row.script && row.script.length){
+      const w=wordCount(row.script.map(s=>s.txt).join(' '));
+      totalWords+=w;
+      // add to every node in the current stack (so parents include children totals)
+      stack.forEach(n=>{ n.words+=w; });
+    }
+  });
+  // compute minutes
+  (function walk(nodes){ nodes.forEach(n=>{ n.minutes=minutesFromWords(n.words); walk(n.children); }); })(toc);
+  return {counts, toc, totalWords, totalMinutes:minutesFromWords(totalWords)};
+}
+
+// Generate a video list. splitLevel = which heading level defines one video (default deepest used=2).
+// courseCode, week from UI. Returns array of {code,title,minutes,type}
+function videoList(toc, courseCode, week, splitLevel){
+  const list=[];
+  let lectureSeq=0;
+  function isInterview(title){ return /interview|q&a|panel|discussion/i.test(title||''); }
+  function collect(nodes){
+    nodes.forEach(n=>{
+      if(n.level===splitLevel){
+        const interview=isInterview(n.title);
+        const typeIdx=interview?2:1;
+        lectureSeq++;
+        const code=`${courseCode||'COURSE'}-Week${week||'?'}-${typeIdx}.${lectureSeq}`;
+        list.push({code,title:n.title,minutes:n.minutes,type:interview?'Interview':'Lecture'});
+      } else if(n.children.length){ collect(n.children); }
+      else if(n.level<splitLevel){ // leaf shallower than splitLevel — still a video
+        lectureSeq++;
+        const code=`${courseCode||'COURSE'}-Week${week||'?'}-1.${lectureSeq}`;
+        list.push({code,title:n.title,minutes:n.minutes,type:'Lecture'});
+      }
+    });
+  }
+  collect(toc);
+  return list;
+}
+
+// Flat list of heading rows for the split UI: [{rowIndex, level, title, minutes}]
+// minutes = script words from this heading row until the next heading (its own direct segment,
+// not including deeper children — we sum the run of data rows until the next heading).
+function headingSegments(rows){
+  const segs=[];
+  let cur=null;
+  rows.forEach((row,i)=>{
+    if(row.type==='heading'){
+      cur={rowIndex:i, level:row.level, title:row.heading.title, num:row.heading.num, words:0};
+      segs.push(cur);
+    } else if(cur && row.script && row.script.length){
+      cur.words += wordCount(row.script.map(s=>s.txt).join(' '));
+    }
+  });
+  segs.forEach(s=>s.minutes=minutesFromWords(s.words));
+  return segs;
+}
+
+// Given rows + an array of split row-indices (heading indices where a NEW video starts),
+// produce video groups. The first video always begins at the first content.
+// Returns [{code,title,minutes,type,startRow,endRow(exclusive)}]
+function splitVideos(rows, splitRowIndices, courseCode, week){
+  const headings = headingSegments(rows);
+  if(!headings.length) return [];
+  // boundaries: always include the first heading row; add user splits; sort unique
+  const bounds = Array.from(new Set([headings[0].rowIndex, ...splitRowIndices])).sort((a,b)=>a-b);
+  const isInterview=t=>/interview|q&a|panel|discussion/i.test(t||'');
+  const groups=[];
+  for(let i=0;i<bounds.length;i++){
+    const start=bounds[i];
+    const end=(i+1<bounds.length)?bounds[i+1]:rows.length;
+    // title = first heading at/after start within [start,end)
+    let title='(untitled)', words=0;
+    for(let r=start;r<end;r++){
+      const row=rows[r];
+      if(row.type==='heading' && title==='(untitled)') title=row.heading.title;
+      if(row.type!=='heading' && row.script && row.script.length) words+=wordCount(row.script.map(s=>s.txt).join(' '));
+    }
+    groups.push({startRow:start,endRow:end,title,words,minutes:minutesFromWords(words),
+      interview:isInterview(title)});
+  }
+  // assign codes: lecture type=1, interview type=2; sequence increments across the week
+  let seq=0;
+  groups.forEach(g=>{ seq++; const type=g.interview?2:1;
+    g.code=`${courseCode||'COURSE'}-Week${week||'?'}-${type}.${seq}`;
+    g.type=g.interview?'Interview':'Lecture'; });
+  return groups;
+}
+
+
+/* ============================================================
+   RENDER (preview) + DOCX BUILD + UI WIRING
+   ============================================================ */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// destination -> preview text color when white background (original colors)
+const DEST_PREVIEW_COLOR = {graphic:'#2E7D32',video:'#0F9ED5',playposit:'#C00000',script:'#1f2328',fdnotes:'#0F9ED5'};
+// tint backgrounds
+const TINT = {video:'#dbeafe',graphic:'#e5f4e0',script:'#e5f4e0',playposit:'#ffe8cc'};
+
+function cleanRun(r, cleanSet){
+  // return a shallow copy with cleaned formatting flags
+  const o={...r};
+  if(cleanSet.has('bold')) o.bold=false;
+  if(cleanSet.has('italic')) o.italic=false;
+  if(cleanSet.has('underline')) o.underline=false;
+  if(cleanSet.has('strike')) o.strike=false;
+  return o; // highlight always kept
+}
+
+function segColorForCell(seg, colMode){
+  if(colMode==='tint') return '#000000';
+  return DEST_PREVIEW_COLOR[seg.dest] || '#1f2328';
+}
+// per-run color for preview: tint => black; white => run's own color, else destination color
+function runColorForCell(r, seg, colMode){
+  if(colMode==='tint') return '#000000';
+  if(r && r.color) return '#'+String(r.color).replace('#','');
+  return DEST_PREVIEW_COLOR[seg.dest] || '#1f2328';
+}
+
+function fmtRunHtml(r, color){
+  let t=esc((r.txt||'').replace(/\t/g,'  '));
+  if(r.bold) t=`<b>${t}</b>`;
+  if(r.italic) t=`<i>${t}</i>`;
+  if(r.underline) t=`<u>${t}</u>`;
+  if(r.strike) t=`<s>${t}</s>`;
+  if(r.vertAlign==='superscript') t=`<sup>${t}</sup>`;
+  else if(r.vertAlign==='subscript') t=`<sub>${t}</sub>`;
+  const hl = (r.highlight==='yellow') ? ';background:#fff3a3' : (r.highlight?';background:#e0e0e0':'');
   return `<span style="color:${color}${hl}">${t}</span>`;
 }
-function segsToHtml(segs, withPrefix, stripHL){
+
+function segsToHtml(segs, colMode, cleanSet){
   if(!segs || !segs.length) return '';
   let html=''; let open=false;
   segs.forEach((s,i)=>{
-    const color = s.cls==='green'?'#2E7D32':(s.cls==='red'?'#C00000':(s.cls==='blue'?'#0F9ED5':'#1f2328'));
-    const startNew = (s.lineStart===true)||i===0;
-    if(startNew){
-      if(open) html+='</div>';
-      const al = s.align==='center'?'center':(s.align==='right'?'right':(s.align==='both'?'justify':'left'));
+    const color=segColorForCell(s,colMode);
+    const startNew=(s.lineStart===true)||i===0;
+    if(startNew){ if(open) html+='</div>';
+      const al=s.align==='center'?'center':(s.align==='right'?'right':(s.align==='both'?'justify':'left'));
       html+=`<div style="text-align:${al}">`; open=true;
       if(s.markerText) html+=`<span style="color:${color}">${esc(s.markerText).replace(/\t/g,' ')}</span>`;
-      if(withPrefix&&s.prefix) html+=`<span style="color:${color}">${esc(s.prefix)}</span>`;
+      if(s.prefix) html+=`<span style="color:${color}">${esc(s.prefix)}</span>`;
     }
-    const srcRuns=(s.runs&&s.runs.length)?s.runs:[{txt:(s.txt||'')}];
-    srcRuns.forEach(r=> html+=fmtRun({...r, txt:(r.txt||'').replace(/\t/g,'  ')},color,stripHL));
+    const rs=(s.runs&&s.runs.length)?s.runs:[{txt:s.txt}];
+    rs.forEach(r=> html+=fmtRunHtml(cleanRun(r,cleanSet), runColorForCell(r,s,colMode)));
+    if(s.prefixClose && i===segs.length-1) html+=`<span style="color:${color}">${esc(s.prefixClose)}</span>`;
   });
   if(open) html+='</div>';
   return html;
 }
-function renderPreview(rows){
-  let html = '<table><tr><th>Videos</th><th>Graphics</th><th>Script</th><th>PlayPosit</th></tr>';
-  for(const row of rows){
-    const v = segsToHtml(Array.isArray(row.video)?row.video:[], true);
-    const g = segsToHtml(row.graphics, false);
-    const sc = segsToHtml(row.script, false, true); // strip highlight in Script preview too
-    const pp = segsToHtml(row.playposit||[], false);
-    const vstyle = row.type==='module' ? ' style="font-weight:700"' : '';
-    html += `<tr><td${vstyle}>${v}</td><td>${g}</td><td>${sc}</td><td>${pp}</td></tr>`;
-  }
-  html += '</table>';
+
+function renderPreview(rows, cfg){
+  const cleanSet=cfg.cleanSet;
+  let html='<table><tr><th>Videos</th><th>Graphics</th><th>Script</th><th>PlayPosit</th></tr>';
+  rows.forEach(row=>{
+    if(row.type==='heading'){
+      const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
+      const numLabel=`${esc(label)}${row.heading.num?(' '+esc(row.heading.num)):''}`;
+      const title=esc(row.heading.title);
+      const numInVideo=(cfg.headingPlace==='videoonly');
+      const scriptText=numInVideo?title:(numLabel+': '+title);
+      html+=`<tr style="background:#e5f4e0">`
+        +`<td><strong>${numInVideo?numLabel:''}</strong></td>`
+        +`<td><strong>${title}</strong></td>`
+        +`<td><strong>${scriptText}</strong></td>`
+        +`<td></td></tr>`;
+      return;
+    }
+    const v=segsToHtml(row.video,cfg.styleVideo,cleanSet);
+    const g=segsToHtml(row.graphics,cfg.styleGraphic,cleanSet);
+    const sc=segsToHtml(row.script,cfg.styleScript,cleanSet);
+    const pp=segsToHtml(row.playposit,cfg.stylePp,cleanSet);
+    const bg=(m,d)=> m==='tint'?`background:${TINT[d]}`:'';
+    html+=`<tr>`
+      +`<td style="${row.video.length?bg(cfg.styleVideo,'video'):''}">${v}</td>`
+      +`<td style="${row.graphics.length?bg(cfg.styleGraphic,'graphic'):''}">${g}</td>`
+      +`<td style="${row.script.length?bg(cfg.styleScript,'script'):''}">${sc}</td>`
+      +`<td style="${row.playposit.length?bg(cfg.stylePp,'playposit'):''}">${pp}</td></tr>`;
+  });
+  html+='</table>';
   return html;
 }
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-/* ---------- build .docx ---------- */
+/* ---------- docx ---------- */
 function getDocxLib(){
-  // The CDN UMD build may attach to window.docx, window.docxjs, or just leak globals.
-  const cand = window.docx || window.docxjs || (typeof Document!=='undefined' && window.Packer ? window : null);
-  if(cand && cand.Document && cand.Packer) return cand;
-  // last resort: scan window for the signature
-  for(const k of Object.keys(window)){
-    const v = window[k];
-    if(v && typeof v==='object' && v.Document && v.Packer && v.Table) return v;
-  }
+  const cand=window.docx||window.docxjs||(typeof Document!=='undefined'&&window.Packer?window:null);
+  if(cand&&cand.Document&&cand.Packer) return cand;
+  for(const k of Object.keys(window)){ const v=window[k]; if(v&&typeof v==='object'&&v.Document&&v.Packer&&v.Table) return v; }
   return null;
 }
 
-async function buildDocx(rows, videoLabel){
-  const D = getDocxLib();
-  if(!D) throw new Error('docx library did not load — check your internet connection and reload.');
-  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,BorderStyle,ShadingType,HeadingLevel} = D;
+async function buildDocx(rows, cfg, videoLabel, summary){
+  const D=getDocxLib();
+  if(!D) throw new Error('docx library did not load — check your connection and reload.');
+  const {Document,Packer,Paragraph,TextRun,Tab,Table,TableRow,TableCell,WidthType,BorderStyle,ShadingType}=D;
+  const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
+  const borders={top:border,bottom:border,left:border,right:border};
+  const colW=[2200,4400,6400,1400]; const totalW=14400;
+  const margins={top:60,bottom:60,left:100,right:100};
+  const cleanSet=cfg.cleanSet;
 
-  const border = {style:BorderStyle.SINGLE, size:1, color:'CCCCCC'};
-  const borders = {top:border,bottom:border,left:border,right:border};
-  const colW = [2200, 4400, 6400, 1400]; // sums to 14400 = landscape US Letter content (0.5" margins)
-  const totalW = colW.reduce((a,b)=>a+b,0);
-  const margins = {top:60,bottom:60,left:100,right:100};
-
-  function cell(children, w, shade){
-    return new TableCell({
-      borders, width:{size:w,type:WidthType.DXA}, margins,
-      shading: shade ? {fill:shade, type:ShadingType.CLEAR} : undefined,
-      children
-    });
+  function shadeHex(m,d){ return m==='tint' ? {video:'DBEAFE',graphic:'E5F4E0',script:'E5F4E0',playposit:'FFE8CC'}[d] : undefined; }
+  function cell(children,w,shade){
+    return new TableCell({borders,width:{size:w,type:WidthType.DXA},margins,
+      shading:shade?{fill:shade,type:ShadingType.CLEAR}:undefined, children});
   }
-  // Map Word underline style to docx UnderlineType
   function underlineOpt(style){
-    const U = D.UnderlineType || {};
-    const map = { single:U.SINGLE, double:U.DOUBLE, thick:U.THICK, dotted:U.DOTTED,
-                  dash:U.DASH, wave:U.WAVE, wavyHeavy:U.WAVYHEAVY, dashLong:U.DASHLONG,
-                  dotDash:U.DOTDASH, dotDotDash:U.DOTDOTDASH, words:U.WORDS };
-    const t = map[style] || U.SINGLE;
-    return t ? {type:t} : {};
+    const U=D.UnderlineType||{};
+    const map={single:U.SINGLE,double:U.DOUBLE,thick:U.THICK,dotted:U.DOTTED,dash:U.DASH,wave:U.WAVE};
+    return {type:map[style]||U.SINGLE};
   }
-  // Convert one source run into one or more TextRuns, splitting on tabs so docx renders real tabs.
-  // Color comes from the segment class (PPD palette); formatting carries from the source run.
-  // stripHL=true removes yellow highlight (used for the Script column).
-  function textRunsFromRun(r, classColor, prefixText, stripHL){
-    const {Tab} = D;
-    const pieces = [];
-    let text = (prefixText||'') + (r.txt||'');
-    const parts = text.split('\t');
-    parts.forEach((part, idx)=>{
-      if(idx>0) pieces.push(new TextRun({children:[new Tab()]}));
+  function alignFor(a){ if(a==='center')return D.AlignmentType.CENTER; if(a==='right')return D.AlignmentType.RIGHT; if(a==='both')return D.AlignmentType.JUSTIFIED; return undefined; }
+  function fontFor(r){ return cfg.fontMode==='convert' ? cfg.fontChoice : (r.font || cfg.scriptFont || undefined); }
+  function colorForDocx(seg){
+    if(seg.__forceBlack) return '000000';
+    return {graphic:'2E7D32',video:'0F9ED5',playposit:'C00000',fdnotes:'0F9ED5',script:'000000'}[seg.dest]||'000000';
+  }
+  // resolve a run's color: tint mode => black; white mode => run's own color, else destination color
+  function resolveColor(r, seg, colMode){
+    if(colMode==='tint') return '000000';
+    if(r && r.color) return String(r.color).replace('#','').toUpperCase();
+    return colorForDocx(seg);
+  }
+
+  function textRuns(r, seg, colMode){
+    const cr=cleanRun(r,cleanSet);
+    const colorHex=resolveColor(cr, seg, colMode);
+    const parts=(cr.txt||'').split('\t');
+    const out=[];
+    parts.forEach((part,idx)=>{
+      if(idx>0) out.push(new TextRun({children:[new Tab()]}));
       if(part.length){
-        const opt = {text:part, color:classColor};
-        if(r.bold) opt.bold = true;
-        if(r.italic) opt.italics = true;
-        if(r.underline) opt.underline = underlineOpt(r.underlineStyle);
-        if(r.strike==='double') opt.doubleStrike = true;
-        else if(r.strike) opt.strike = true;
-        if(r.vertAlign==='superscript') opt.superScript = true;
-        else if(r.vertAlign==='subscript') opt.subScript = true;
-        if(r.font) opt.font = r.font;
-        if(r.size) opt.size = r.size; // half-points
-        if(r.highlight && !stripHL) opt.highlight = r.highlight; // RULE 2: strip in Script column
-        pieces.push(new TextRun(opt));
+        const o={text:part,color:colorHex};
+        if(cr.bold) o.bold=true;
+        if(cr.italic) o.italics=true;
+        if(cr.underline) o.underline=underlineOpt(cr.underlineStyle);
+        if(cr.strike==='double') o.doubleStrike=true; else if(cr.strike) o.strike=true;
+        if(cr.vertAlign==='superscript') o.superScript=true; else if(cr.vertAlign==='subscript') o.subScript=true;
+        const f=fontFor(cr); if(f) o.font=f;
+        if(cr.size) o.size=cr.size;
+        if(cr.highlight) o.highlight=cr.highlight; // ALWAYS keep highlight
+        out.push(new TextRun(o));
       }
     });
-    return pieces;
+    return out;
   }
 
-  function colorFor(cls){
-    return cls==='green' ? '2E7D32' : (cls==='red' ? 'C00000' : (cls==='blue' ? '0F9ED5' : '000000'));
-  }
-
-  function alignFor(a){
-    if(a==='center') return D.AlignmentType.CENTER;
-    if(a==='right') return D.AlignmentType.RIGHT;
-    if(a==='both') return D.AlignmentType.JUSTIFIED;
-    return undefined;
-  }
-
-  // Build paragraphs from segments. stripHL strips yellow highlight (Script column only).
-  function runsFromSegs(segs, withPrefix, stripHL){
-    if(!segs.length) return [new Paragraph({children:[new TextRun('')]})];
-    const out = [];
-    let current = null;
-    segs.forEach((s, i)=>{
-      const classColor = colorFor(s.cls);
-      const startNew = (s.lineStart===true) || i===0;
-      if(startNew){ current = {children:[], align:alignFor(s.align)}; out.push(current); }
-      if(s.markerText){
-        textRunsFromRun({txt:s.markerText}, classColor, '', stripHL).forEach(tr=>current.children.push(tr));
-      }
-      const srcRuns = (s.runs && s.runs.length) ? s.runs : [{txt:(s.txt||'').replace(s.markerText||'','')}];
-      srcRuns.forEach((r, ri)=>{
-        const prefix = (withPrefix && s.prefix && ri===0) ? s.prefix : '';
-        textRunsFromRun(r, classColor, prefix, stripHL).forEach(tr=>current.children.push(tr));
-      });
+  function paras(segs, colMode){
+    if(!segs||!segs.length) return [new Paragraph({children:[new TextRun('')]})];
+    const out=[]; let cur=null;
+    segs.forEach((s,i)=>{
+      const markerColor = (colMode==='tint') ? '000000' : colorForDocx(s);
+      const startNew=(s.lineStart===true)||i===0;
+      if(startNew){ cur={children:[],align:alignFor(s.align)}; out.push(cur); }
+      if(s.markerText) textRuns({txt:s.markerText, color:(colMode==='tint'?null:(s.runs&&s.runs[0]&&s.runs[0].color))}, s, colMode).forEach(t=>cur.children.push(t));
+      if(s.prefix) cur.children.push(new TextRun({text:s.prefix,color:markerColor}));
+      const rs=(s.runs&&s.runs.length)?s.runs:[{txt:s.txt}];
+      rs.forEach(r=> textRuns(r,s,colMode).forEach(t=>cur.children.push(t)));
+      if(s.prefixClose && i===segs.length-1) cur.children.push(new TextRun({text:s.prefixClose,color:markerColor}));
     });
-    return out.map(o => new Paragraph({children: o.children.length?o.children:[new TextRun('')], alignment:o.align}));
+    return out.map(o=>new Paragraph({children:o.children.length?o.children:[new TextRun('')],alignment:o.align}));
   }
 
-  const headerRow = new TableRow({children:[
-    cell([new Paragraph({children:[new TextRun({text:'Videos',bold:true})]})], colW[0], 'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})], colW[1], 'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})], colW[2], 'E8E6DF'),
-    cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})], colW[3], 'E8E6DF'),
+  const metaRow=new TableRow({children:[
+    cell([new Paragraph('')],colW[0]),
+    cell([new Paragraph({children:[new TextRun({text:'Team:    ID:    VP:    VE:    MMD:',color:'808080'})]})],colW[1]),
+    cell([new Paragraph('')],colW[2]),
+    cell([new Paragraph('')],colW[3]),
   ]});
 
-  // blank metadata row + week label row, like the example
-  const metaRow = new TableRow({children:[
-    cell([new Paragraph('')], colW[0]),
-    cell([new Paragraph({children:[new TextRun({text:'Team:    ID:    VP:    VE:    MMD:',color:'808080'})]})], colW[1]),
-    cell([new Paragraph('')], colW[2]),
-    cell([new Paragraph('')], colW[3]),
-  ]});
-  const weekRow = new TableRow({children:[
-    cell([new Paragraph({children:[new TextRun({text:videoLabel,bold:true})]})], colW[0]),
-    cell([new Paragraph('')], colW[1]),
-    cell([new Paragraph('')], colW[2]),
-    cell([new Paragraph('')], colW[3]),
-  ]});
+  function headerRowNew(){ return new TableRow({children:[
+    cell([new Paragraph({children:[new TextRun({text:'Videos',bold:true})]})],colW[0],'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})],colW[1],'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})],colW[2],'E8E6DF'),
+    cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})],colW[3],'E8E6DF'),
+  ]}); }
 
-  const bodyRows = rows.map(row=>{
-    const isModule = row.type==='module';
-    const shade = isModule?'F4F2EC':undefined;
-    const videoSegs = Array.isArray(row.video) ? row.video : [];
+  function makeRow(row){
+    if(row.type==='heading'){
+      const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
+      const numLabel = `${label}${row.heading.num?(' '+row.heading.num):''}`;
+      const title = row.heading.title;
+      const numInVideo = (cfg.headingPlace==='videoonly');
+      const scriptText = numInVideo ? title : (numLabel+': '+title);
+      return new TableRow({children:[
+        cell([new Paragraph({children:[new TextRun({text: numInVideo ? numLabel : '', bold:true})]})],colW[0],'E5F4E0'),
+        cell([new Paragraph({children:[new TextRun({text:title,bold:true})]})],colW[1],'E5F4E0'),
+        cell([new Paragraph({children:[new TextRun({text:scriptText,bold:true})]})],colW[2],'E5F4E0'),
+        cell([new Paragraph('')],colW[3],'E5F4E0'),
+      ]});
+    }
     return new TableRow({children:[
-      cell(runsFromSegs(videoSegs, true), colW[0], shade),     // Video: module label OR red production notes (with prefix)
-      cell(runsFromSegs(row.graphics, false), colW[1], shade), // Graphics: green, NO prefix, keep highlight
-      cell(runsFromSegs(row.script, false, true), colW[2], shade),   // Script: STRIP yellow highlight
-      cell(runsFromSegs(row.playposit||[], false), colW[3], shade), // PlayPosit: blue, keep highlight
+      cell(paras(row.video,cfg.styleVideo), colW[0], row.video.length?shadeHex(cfg.styleVideo,'video'):undefined),
+      cell(paras(row.graphics,cfg.styleGraphic), colW[1], row.graphics.length?shadeHex(cfg.styleGraphic,'graphic'):undefined),
+      cell(paras(row.script,cfg.styleScript), colW[2], row.script.length?shadeHex(cfg.styleScript,'script'):undefined),
+      cell(paras(row.playposit,cfg.stylePp), colW[3], row.playposit.length?shadeHex(cfg.stylePp,'playposit'):undefined),
     ]});
-  });
+  }
 
-  const table = new Table({
-    width:{size:totalW,type:WidthType.DXA},
-    columnWidths:colW,
-    rows:[headerRow, metaRow, weekRow, ...bodyRows]
-  });
+  const defFont = cfg.fontMode==='convert' ? cfg.fontChoice : (cfg.scriptFont || 'Arial');
+  const children=[
+    new Paragraph({children:[new TextRun({text:videoLabel+' — PPD',bold:true,size:28})]}),
+    new Paragraph({children:[new TextRun({text:`Script ${summary.totalWords} words · est. ${Math.round(summary.totalMinutes)} min @ ${WPM} wpm. Text unchanged.`,color:'808080',size:18})]}),
+    new Paragraph(''),
+  ];
 
-  const doc = new Document({
-    styles:{default:{document:{run:{font:'Arial',size:20}}}},
+  const videos = (cfg.videoGroups && cfg.videoGroups.length) ? cfg.videoGroups : null;
+  if(!videos){
+    // single table
+    const bodyRows=rows.map(makeRow);
+    children.push(new Table({width:{size:totalW,type:WidthType.DXA},columnWidths:colW,rows:[headerRowNew(),metaRow,...bodyRows]}));
+  } else {
+    // one table per video group, each preceded by its video-code heading
+    videos.forEach((g,gi)=>{
+      children.push(new Paragraph({children:[new TextRun({text:`${g.code}  (${g.title})  est. ${Math.round(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}`,bold:true,size:24,color:'2c557f'})]}));
+      const slice=rows.slice(g.startRow,g.endRow);
+      const bodyRows=slice.map(makeRow);
+      const tblRows = gi===0 ? [headerRowNew(),metaRow,...bodyRows] : [headerRowNew(),...bodyRows];
+      children.push(new Table({width:{size:totalW,type:WidthType.DXA},columnWidths:colW,rows:tblRows}));
+      children.push(new Paragraph(''));
+    });
+  }
+
+  const doc=new Document({
+    styles:{default:{document:{run:{font:defFont,size:20}}}},
     sections:[{
       properties:{page:{size:{width:12240,height:15840,orientation:D.PageOrientation.LANDSCAPE},margin:{top:720,right:720,bottom:720,left:720}}},
-      children:[
-        new Paragraph({children:[new TextRun({text:videoLabel+' — PPD',bold:true,size:28})]}),
-        new Paragraph({children:[new TextRun({text:'Generated from script. Text unchanged.',color:'808080',size:18})]}),
-        new Paragraph(''),
-        table
-      ]
+      children
     }]
   });
   return await Packer.toBlob(doc);
 }
 
-/* ---------- wiring ---------- */
-const fileInput = document.getElementById('file');
-const drop = document.getElementById('drop');
-const goBtn = document.getElementById('go');
-const statusEl = document.getElementById('status');
-const filechip = document.getElementById('filechip');
-const ptog = document.getElementById('ptog');
-const previewEl = document.getElementById('preview');
-let parsedParas = null;
-let currentFileName = '';
+/* ============================================================
+   UI WIRING
+   ============================================================ */
+const $=id=>document.getElementById(id);
+let parsedParas=null, detectedColors=[], detectedFormats=[], levelTerms=['Module','Section'];
+let splitOn=false, splitSet=new Set(), lastVideoGroups=null;
 
-function updateLabel(){
-  const c = document.getElementById('course').value.trim() || 'COURSE';
-  const w = document.getElementById('week').value.trim() || '?';
-  document.getElementById('vidlabel').textContent = `${c}_Wk${w}`;
-  return `${c}_Wk${w}`;
+/* ----- read all settings into a config object ----- */
+function readConfig(){
+  const coding = document.querySelector('input[name=coding]:checked').value;
+  const colorDest={}; detectedColors.forEach(c=>{ const el=$('cmap_'+c); colorDest[c]= el?el.value:(DEFAULT_COLOR_DEST[c]||'graphic'); });
+  const formatDest={}; ['underline','bold','italic'].forEach(fm=>{ const el=$('fmap_'+fm); if(el) formatDest[fm]=el.value; });
+  const cleanSet=new Set();
+  document.querySelectorAll('.clean:checked').forEach(c=>cleanSet.add(c.value));
+  if($('clean_all').checked){ ['bold','italic','underline','strike'].forEach(x=>cleanSet.add(x)); }
+  const fontMode=document.querySelector('input[name=font]:checked').value;
+  return {
+    coding, colorDest, formatDest,
+    cleanSet,
+    fontMode, fontChoice:$('fontChoice').value,
+    scriptFont: (parsedParas && parsedParas.scriptFont) || null,
+    onePerLine:$('onePerLine').checked,
+    levelTerms:levelTerms.slice(),
+    headingPlace:document.querySelector('input[name=headingPlace]:checked').value,
+    graphicDup:document.querySelector('input[name=graphicDup]:checked').value,
+    styleVideo:$('style_video').value, styleGraphic:$('style_graphic').value,
+    styleScript:$('style_script').value, stylePp:$('style_pp').value,
+  };
 }
 
-// Try to detect a course code and week number from the script's own text.
-// Only fills a field if the user hasn't already typed something there.
-function autoFillFromScript(paras){
-  const courseEl = document.getElementById('course');
-  const weekEl = document.getElementById('week');
-  // scan the first ~15 non-blank paragraphs (header/legend region)
-  const head = paras.filter(p=>!p.blank).slice(0,15).map(p=>p.full);
+/* ----- build the color-map rows from detected colors ----- */
+function buildColorMap(){
+  const box=$('colorMapRows'); box.innerHTML='';
+  const opts=['graphic','video','script','playposit','fdnotes','animation'];
+  if(!detectedColors.length){ box.innerHTML='<p class="mini">No colored text detected. Everything will go to the Script column.</p>'; return; }
+  detectedColors.forEach(c=>{
+    const row=document.createElement('div'); row.className='map-row';
+    const sw=`<span class="swatch" style="background:${COLOR_HEX[c]||'#999'}"></span>`;
+    const name=`<span class="name">${c[0].toUpperCase()+c.slice(1)}</span>`;
+    let sel=`<select id="cmap_${c}">`;
+    opts.forEach(o=>{ sel+=`<option value="${o}"${ (DEFAULT_COLOR_DEST[c]===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
+    sel+='</select>';
+    row.innerHTML=sw+name+sel;
+    box.appendChild(row);
+  });
+}
+/* ----- format-map rows ----- */
+function buildFormatMap(){
+  const box=$('formatMapRows'); box.innerHTML='';
+  const opts=['graphic','video','script','playposit','fdnotes','animation'];
+  const fmts=[['underline','Underline'],['bold','Bold'],['italic','Italic']];
+  fmts.forEach(([fm,label])=>{
+    const present=detectedFormats.includes(fm);
+    const row=document.createElement('div'); row.className='map-row';
+    const name=`<span class="name">${label}${present?'':' <span class="mini">(none found)</span>'}</span>`;
+    let sel=`<select id="fmap_${fm}">`;
+    opts.forEach(o=>{ sel+=`<option value="${o}"${ (DEFAULT_FORMAT_DEST[fm]===o)?' selected':'' }>${DEST_LABEL[o]}</option>`; });
+    sel+='</select>';
+    row.innerHTML=name+sel;
+    box.appendChild(row);
+  });
+}
 
-  // WEEK: "Week #12", "WEEK 3", etc.
-  if(!weekEl.value.trim()){
-    for(const t of head){
-      const m = t.match(/week\s*#?\s*(\d+)/i);
-      if(m){ weekEl.value = m[1]; break; }
-    }
-  }
+/* ----- level rows ----- */
+function buildLevelRows(){
+  const box=$('levelRows'); box.innerHTML='';
+  levelTerms.forEach((term,i)=>{
+    const row=document.createElement('div'); row.className='lvl-row';
+    row.innerHTML=`<span class="lvlnum">Level ${i+1}</span>`
+      +`<input type="text" value="${term.replace(/"/g,'&quot;')}" data-i="${i}">`
+      +`<button class="btn sec" data-rm="${i}">Remove</button>`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{ levelTerms[+e.target.dataset.i]=e.target.value; refresh(); }));
+  box.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',e=>{ const i=+e.target.dataset.rm; if(levelTerms.length>1){ levelTerms.splice(i,1); buildLevelRows(); refresh(); } }));
+}
 
-  // COURSE CODE: look for a line like "Law 609.JDi. LCR 1 2025 ..." or "ABC 123 ... LCR 2"
-  // Build a compact code from course-number + section if present. Generic, not tied to any school.
-  if(!courseEl.value.trim()){
-    let code = '';
-    for(const t of head){
-      // pattern: letters + number (course), optionally a section token like "LCR 1" / "Sec 2"
-      const cm = t.match(/\b([A-Za-z]{2,6})\s*[-_ ]?\s*(\d{2,4}[A-Za-z]?)\b/);
-      if(cm){
-        code = (cm[1] + cm[2]).toUpperCase();
-        const sec = t.match(/\b(?:LCR|SEC|SECTION|LEC)\s*[-_ ]?\s*(\d+)\b/i);
-        if(sec) code += '_LCR' + sec[1];
-        break;
+/* ----- dashboard ----- */
+function renderDashboard(rows, cfg){
+  const sum=summarize(rows);
+  const c=sum.counts;
+  const stat=(n,l)=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  let html=`<div class="dash"><div class="grid">`
+    +stat(c.graphic,'Graphic elements')
+    +stat(c.animation,'Animations')
+    +stat(c.video,'Video elements')
+    +stat(c.playposit,'PlayPosit elements')
+    +stat(c.fdnotes,'FD notes')
+    +stat(sum.totalWords,'Script words')
+    +stat(Math.round(sum.totalMinutes)+' min','Teleprompter @ '+WPM+' wpm')
+    +`</div>`;
+  // ToC
+  html+=`<div style="margin-bottom:8px"><strong>Table of contents</strong> <span class="mini">(⚠️ = segment over ${SEG_WARN_MIN} min; consider splitting)</span></div>`;
+  function walk(nodes){ let h=''; nodes.forEach(n=>{
+    const warn = (n.children.length===0 && n.minutes>SEG_WARN_MIN) ? ' <span class="warn">⚠️</span>' : '';
+    h+=`<div class="toc-item toc-l${Math.min(n.level,4)}">${'· '.repeat(0)}${esc(n.title)} — ${fmtMin(n.minutes)} min${warn}</div>`;
+    if(n.children.length) h+=walk(n.children);
+  }); return h; }
+  html+=walk(sum.toc);
+
+  // ----- video splitting -----
+  const course=$('course').value.trim(), week=$('week').value.trim();
+  const headings = headingSegments(rows);
+  html+=`<div style="margin-top:16px"><label class="chk"><input type="checkbox" id="splitToggle" ${splitOn?'checked':''}> Split this week into multiple videos / tables</label></div>`;
+
+  if(!splitOn){
+    // simple auto video list (deepest level = 2), as before
+    const vl=videoList(sum.toc, course, week, 2);
+    html+=`<div style="margin-top:10px"><strong>Video list</strong> <span class="mini">code = Course-Week-type.seq</span></div>`;
+    html+='<div class="vlist">'+ (vl.length? vl.map(v=>`${v.code}  (${esc(v.title)})  est. ${Math.round(v.minutes)} min${v.type==='Interview'?'  [Interview]':''}`).join('\n') : '(no headings found)') +'</div>';
+    lastVideoGroups=null;
+  } else {
+    // manual split UI: list heading segments with "add split here" between them
+    html+=`<div style="margin-top:10px"><strong>Place splits between sections.</strong> <span class="mini">Each split starts a new video &amp; table.</span></div>`;
+    html+='<div id="splitList" style="margin-top:8px">';
+    headings.forEach((hd,i)=>{
+      const indent = (hd.level-1)*20;
+      const isSplit = splitSet.has(hd.rowIndex);
+      if(i>0){
+        html+=`<div style="margin:2px 0 2px ${indent}px">`
+          + (isSplit
+              ? `<span class="pill" style="background:#dbeafe;color:#2c557f">▲ new video starts here</span> <a href="#" data-unsplit="${hd.rowIndex}" style="font-size:.78rem;color:#c00">remove</a>`
+              : `<a href="#" data-split="${hd.rowIndex}" style="font-size:.78rem;color:var(--accent)">+ Add split here</a>`)
+          + `</div>`;
       }
-    }
-    if(code) courseEl.value = code;
+      html+=`<div class="toc-item" style="padding-left:${indent}px">${'—'.repeat(0)}${esc(hd.title)} <span class="mini">(${fmtMin(hd.minutes)} min)</span></div>`;
+    });
+    html+='</div>';
+
+    const groups=splitVideos(rows, [...splitSet], course, week);
+    lastVideoGroups=groups;
+    html+=`<div style="margin-top:14px"><strong>Video list &amp; tables</strong></div>`;
+    html+='<div class="vlist">'+ groups.map(g=>{
+      const secs=[];
+      for(let r=g.startRow;r<g.endRow;r++){ if(rows[r].type==='heading') secs.push(rows[r].heading.title); }
+      return `${g.code}  (${esc(g.title)})  est. ${Math.round(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}\n`
+        + `    [table: ${secs.map(esc).join(' · ')||'—'}]`;
+    }).join('\n') +'</div>';
   }
+
+  html+=`<div style="margin-top:10px"><button class="btn sec" id="copySummary">Copy summary</button> <button class="btn sec" id="copyVideos">Copy video list</button></div>`;
+  html+='</div>';
+  $('dashboard').innerHTML=html;
+
+  // wire split toggle + add/remove split links
+  const st=$('splitToggle'); if(st) st.onchange=()=>{ splitOn=st.checked; refresh(); };
+  $('dashboard').querySelectorAll('[data-split]').forEach(a=>a.onclick=e=>{e.preventDefault(); splitSet.add(+a.dataset.split); refresh();});
+  $('dashboard').querySelectorAll('[data-unsplit]').forEach(a=>a.onclick=e=>{e.preventDefault(); splitSet.delete(+a.dataset.unsplit); refresh();});
+
+  $('copySummary').onclick=()=>{ navigator.clipboard.writeText($('dashboard').innerText); $('copySummary').textContent='Copied ✓'; setTimeout(()=>$('copySummary').textContent='Copy summary',1500); };
+  $('copyVideos').onclick=()=>{
+    const txt = lastVideoGroups
+      ? lastVideoGroups.map(g=>`${g.code} (${g.title}) est. ${Math.round(g.minutes)} min${g.type==='Interview'?' [Interview]':''}`).join('\n')
+      : videoList(sum.toc,course,week,2).map(v=>`${v.code} (${v.title}) est. ${Math.round(v.minutes)} min`).join('\n');
+    navigator.clipboard.writeText(txt); $('copyVideos').textContent='Copied ✓'; setTimeout(()=>$('copyVideos').textContent='Copy video list',1500);
+  };
+  return sum;
 }
 
-document.getElementById('course').addEventListener('input',updateLabel);
-document.getElementById('week').addEventListener('input',updateLabel);
+/* ----- master refresh: rebuild rows, preview, dashboard ----- */
+let lastRows=null, lastSummary=null, lastCfg=null;
+function refresh(){
+  if(!parsedParas) return;
+  const cfg=readConfig();
+  const rows=buildRows(parsedParas,cfg);
+  $('preview').innerHTML=renderPreview(rows,cfg);
+  lastSummary=renderDashboard(rows,cfg);
+  lastRows=rows; lastCfg=cfg;
+}
 
+/* ----- course/week label ----- */
+function updateLabel(){
+  const c=$('course').value.trim()||'COURSE'; const w=$('week').value.trim()||'?';
+  $('vidlabel').textContent=`${c}_Wk${w}`; return `${c}_Wk${w}`;
+}
+function autoFill(paras){
+  const head=paras.filter(p=>!p.blank).slice(0,15).map(p=>p.full);
+  let detected=false;
+  if(!$('week').value.trim()){ for(const t of head){ const m=t.match(/week\s*#?\s*(\d+)/i); if(m){$('week').value=m[1];detected=true;break;} } }
+  if(!$('course').value.trim()){ let code='';
+    for(const t of head){ const cm=t.match(/\b([A-Za-z]{2,6})\s*[-_ .]?\s*(\d{2,4}[A-Za-z]?)\b/);
+      if(cm){ code=(cm[1]+cm[2]).toUpperCase(); const sec=t.match(/\b(?:LCR|SEC|SECTION|LEC)\s*[-_ ]?\s*(\d+)\b/i); if(sec)code+='_LCR'+sec[1]; break; } }
+    if(code){$('course').value=code;detected=true;} }
+  $('detectPill').textContent = detected ? 'auto-detected — please verify' : 'not detected — please enter';
+}
+
+/* ----- file handling ----- */
+const drop=$('drop'), fileInput=$('file');
 drop.addEventListener('click',()=>fileInput.click());
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('hot')});
 drop.addEventListener('dragleave',()=>drop.classList.remove('hot'));
 drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('hot');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
 fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])});
 
-function setStatus(msg,type){statusEl.className='status '+type; statusEl.textContent=msg;}
+function setStatus(m,t){ const s=$('status'); s.className='status '+t; s.textContent=m; }
 
 async function handleFile(f){
-  if(!f.name.toLowerCase().endsWith('.docx')){setStatus('Please choose a .docx file.','err');return;}
-  currentFileName = f.name.replace(/\.docx$/i,'');
-  filechip.textContent='📄 '+f.name; filechip.classList.add('show');
-  setStatus('Parsing…','info');
+  if(!f.name.toLowerCase().endsWith('.docx')){ $('filechip').textContent='Please choose a .docx file.'; return; }
+  $('filechip').textContent='📄 '+f.name+' — parsing…';
   try{
-    const buf = await f.arrayBuffer();
-    parsedParas = await parseDocx(buf);
-    autoFillFromScript(parsedParas); // detect course code + week (only if fields are empty)
-    updateLabel();
-    goBtn.disabled=false;
-    const greenMode = document.querySelector('input[name=green]:checked').value;
-    const rows = buildRows(parsedParas, greenMode);
-    previewEl.innerHTML = renderPreview(rows);
-    ptog.style.display='inline-block';
-    const dataCount = rows.filter(r=>r.type==='data').length;
-    const modCount = rows.filter(r=>r.type==='module').length;
-    setStatus(`Parsed: ${modCount} module(s), ${dataCount} script paragraph(s). Ready to convert.`,'ok');
-  }catch(err){
-    console.error(err);
-    setStatus('Could not read this file: '+err.message,'err');
-    goBtn.disabled=true;
-  }
+    const buf=await f.arrayBuffer();
+    parsedParas=await parseDocx(buf);
+    detectedColors=detectColors(parsedParas);
+    detectedFormats=detectFormats(parsedParas);
+    // if the script uses format-coding signals but no colors, preselect format mode
+    if(!detectedColors.length && detectedFormats.length){ document.querySelector('input[name=coding][value=format]').checked=true; toggleCoding(); }
+    autoFill(parsedParas); updateLabel();
+    buildColorMap(); buildFormatMap(); buildLevelRows();
+    ['courseCard','settingsCard','summaryCard','genCard'].forEach(id=>$(id).classList.remove('hidden'));
+    $('filechip').textContent='📄 '+f.name;
+    refresh();
+  }catch(err){ console.error(err); $('filechip').textContent='Could not read this file: '+err.message; }
 }
 
-ptog.addEventListener('click',()=>{
-  const open = previewEl.style.display!=='none';
-  previewEl.style.display = open?'none':'block';
-  ptog.textContent = (open?'▸ Show':'▾ Hide')+' parsed preview';
-});
+/* ----- setting toggles ----- */
+function toggleCoding(){
+  const mode=document.querySelector('input[name=coding]:checked').value;
+  $('colorMap').classList.toggle('hidden',mode!=='color');
+  $('formatMap').classList.toggle('hidden',mode!=='format');
+}
+document.querySelectorAll('input[name=coding]').forEach(r=>r.addEventListener('change',()=>{toggleCoding();refresh();}));
+document.querySelectorAll('input[name=font]').forEach(r=>r.addEventListener('change',()=>{ $('fontPick').style.opacity = (document.querySelector('input[name=font]:checked').value==='convert')?'1':'.5'; refresh(); }));
+$('fontChoice').addEventListener('change',refresh);
+$('onePerLine').addEventListener('change',refresh);
+$('clean_all').addEventListener('change',e=>{ document.querySelectorAll('.clean').forEach(c=>c.checked=e.target.checked); refresh(); });
+document.querySelectorAll('.clean').forEach(c=>c.addEventListener('change',refresh));
+['style_video','style_graphic','style_script','style_pp'].forEach(id=>$(id).addEventListener('change',refresh));
+document.querySelectorAll('input[name=headingPlace]').forEach(r=>r.addEventListener('change',refresh));
+document.querySelectorAll('input[name=graphicDup]').forEach(r=>r.addEventListener('change',refresh));
+$('addLevel').addEventListener('click',()=>{ levelTerms.push('Part'); buildLevelRows(); refresh(); });
+$('course').addEventListener('input',()=>{updateLabel();refresh();});
+$('week').addEventListener('input',()=>{updateLabel();refresh();});
+// delegated listener for dynamically built color/format map selects
+document.addEventListener('change',e=>{ if(e.target.id && (e.target.id.startsWith('cmap_')||e.target.id.startsWith('fmap_'))) refresh(); });
 
-// re-render preview when green mode changes
-document.querySelectorAll('input[name=green]').forEach(r=>r.addEventListener('change',()=>{
-  if(parsedParas){
-    const greenMode = document.querySelector('input[name=green]:checked').value;
-    previewEl.innerHTML = renderPreview(buildRows(parsedParas, greenMode));
-  }
-}));
-
-goBtn.addEventListener('click',async()=>{
+/* ----- generate ----- */
+$('go').addEventListener('click',async()=>{
   if(!parsedParas) return;
-  goBtn.disabled=true;
-  setStatus('Building .docx…','info');
+  $('go').disabled=true; setStatus('Building .docx…','info');
   try{
-    const greenMode = document.querySelector('input[name=green]:checked').value;
-    const rows = buildRows(parsedParas, greenMode);
-    const label = updateLabel();
-    const blob = await buildDocx(rows, label);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `PPD_${label}.docx`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const cfg=readConfig();
+    const rows=buildRows(parsedParas,cfg);
+    const summary=summarize(rows);
+    // if splitting is on, compute video groups and attach to cfg for multi-table output
+    cfg.videoGroups = (splitOn && lastVideoGroups && lastVideoGroups.length) ? lastVideoGroups
+                      : (splitOn ? splitVideos(rows,[...splitSet],$('course').value.trim(),$('week').value.trim()) : null);
+    const label=updateLabel();
+    const blob=await buildDocx(rows,cfg,label,summary);
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`PPD_${label}.docx`; a.click(); URL.revokeObjectURL(a.href);
     setStatus('Done — downloaded PPD_'+label+'.docx','ok');
-  }catch(err){
-    console.error(err);
-    setStatus('Build failed: '+err.message,'err');
-  }
-  goBtn.disabled=false;
+  }catch(err){ console.error(err); setStatus('Build failed: '+err.message,'err'); }
+  $('go').disabled=false;
 });
 
 updateLabel();
+
 </script>
 </body>
 </html>
