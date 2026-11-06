@@ -78,6 +78,12 @@
   .vlist{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;white-space:pre-wrap;
     background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px;margin-top:8px}
   .mini{font-size:.8rem;color:var(--muted)}
+  .stylewrap{overflow-x:auto}
+  .styletbl{border-collapse:collapse;width:100%;min-width:520px;font-size:.86rem}
+  .styletbl th{text-align:left;font-size:.78rem;color:var(--muted);font-weight:600;padding:4px 6px}
+  .styletbl td{padding:4px 6px;vertical-align:middle}
+  .styletbl td:first-child{font-weight:600;white-space:nowrap}
+  .styletbl select{width:100%;padding:6px 8px;font-size:.85rem}
   .pill{display:inline-block;font-size:.7rem;padding:1px 7px;border-radius:20px;background:var(--soft);color:var(--muted);margin-left:6px}
 </style>
 </head>
@@ -106,8 +112,8 @@
     </div>
     <div class="hint">Video label: <strong><span id="vidlabel">…</span></strong>. Edit either field if the detection isn't right.</div>
     <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-      <label class="chk"><input type="checkbox" id="noPlayposit"> This script has <strong>no PlayPosit</strong> content</label>
-      <div class="mini" style="margin-top:4px">When checked, the PlayPosit column is removed from the output (3 columns: Videos · Graphics · Script), and PlayPosit is dropped from the color mapping and styling options.</div>
+      <label class="chk"><input type="checkbox" id="noPlayposit"> This script has <strong>no WeVideo</strong> content</label>
+      <div class="mini" style="margin-top:4px">When checked, the WeVideo column is removed from the output (3 columns: Videos · Graphics · Script), and WeVideo is dropped from the color mapping and styling options.</div>
     </div>
   </div>
 
@@ -135,7 +141,7 @@
     <!-- 3.2 Format cleaner -->
     <div class="setting">
       <h4>Format cleaner</h4>
-      <p class="instr">Select any formatting you want removed from the PPD. Highlights are always kept (they mark the correct PlayPosit answer).</p>
+      <p class="instr">Select any formatting you want removed from the PPD. Highlights are always kept (they mark the correct WeVideo answer).</p>
       <div id="cleanBox">
         <label class="chk"><input type="checkbox" id="clean_all"> All</label>
         <label class="chk"><input type="checkbox" class="clean" value="bold"> Bold</label>
@@ -185,40 +191,44 @@
     <!-- 3.5 Heading system -->
     <div class="setting">
       <h4>Heading system</h4>
-      <p class="instr">Name your heading levels (top = highest). Two levels by default; add or remove as needed.</p>
-      <div id="levelRows"></div>
-      <button class="btn sec" id="addLevel">+ Add level</button>
-      <p class="instr" style="margin-top:12px">Heading <strong>titles</strong> always appear in Graphics + Script. Choose where the heading <strong>number</strong> (e.g. "Week 1") goes:</p>
+      <p class="instr">Name your heading levels (top = highest), choose which level divides the week into videos, and how each level is formatted in the Word doc.</p>
+      <div class="stylewrap">
+        <table class="styletbl" style="min-width:640px">
+          <thead><tr><th>Level</th><th>Heading in script</th><th>Divide video by</th><th>Format in Word doc</th><th>Style applied in</th><th></th></tr></thead>
+          <tbody id="levelRows"></tbody>
+        </table>
+      </div>
+      <button class="btn sec" id="addLevel" style="margin-top:6px">+ Add level</button>
+      <p class="mini" style="margin-top:8px"><strong>Divide video by</strong> starts a new video &amp; table at every heading of that level (and any higher level). It stays in sync with the Quick split buttons in the Summary. <strong>Format in Word doc</strong>: each video's title line (e.g. “COURSE-Week5-1.2 (Title) est. 7 min”) is always <strong>Heading 1</strong>. Other levels can use Heading 1–4 inside the table so they show up in Word's Navigation pane.</p>
+      <details id="hdFix" style="margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card)">
+        <summary style="cursor:pointer;font-weight:600;font-size:.92rem">Detected headings <span id="hdFixCount" class="mini"></span></summary>
+        <p class="mini" style="margin:8px 0">Check what was picked up as a heading. Set a wrong one to <strong>Not a heading</strong> to turn it back into script text, or change its level (e.g. a “Closing” that should sit with the Parts). ⚠️ = looks like a sentence, please check.</p>
+        <div id="hdFixList"></div>
+      </details>
+      <p class="instr" style="margin-top:12px">Which columns should heading <strong>titles</strong> appear in?</p>
+      <div>
+        <label class="chk"><input type="checkbox" class="hcol" value="graphic" checked> Graphics</label>
+        <label class="chk"><input type="checkbox" class="hcol" value="script" checked> Script</label>
+        <label class="chk" id="hcolPpLabel"><input type="checkbox" class="hcol" value="playposit"> WeVideo</label>
+      </div>
+      <p class="instr" style="margin-top:12px">Choose where the heading <strong>number</strong> (e.g. "Week 1") goes:</p>
       <div>
         <label class="chk"><input type="radio" name="headingPlace" value="videoonly" checked> Number in the Video column only <span class="mini">(recommended — evergreen)</span></label>
-        <label class="chk"><input type="radio" name="headingPlace" value="content"> Number in the Script column (with the title)</label>
+        <label class="chk"><input type="radio" name="headingPlace" value="content"> Number with the title (in Script / WeVideo)</label>
       </div>
     </div>
 
     <!-- 3.6 Cell styling -->
     <div class="setting">
-      <h4>Cell background &amp; text color</h4>
-      <p class="instr">Choose how each column's cells look. Yellow highlight is never removed.</p>
-      <div class="map-row"><span class="name">Video</span>
-        <select id="style_video">
-          <option value="tint">Light blue background, black text</option>
-          <option value="white">White background, keep original colors</option>
-        </select></div>
-      <div class="map-row"><span class="name">Graphics</span>
-        <select id="style_graphic">
-          <option value="tint">Light green background, black text</option>
-          <option value="white">White background, keep original colors</option>
-        </select></div>
-      <div class="map-row"><span class="name">Script</span>
-        <select id="style_script">
-          <option value="white">White background, keep original colors</option>
-          <option value="tint">Light green background, black text</option>
-        </select></div>
-      <div class="map-row" id="ppStyleRow"><span class="name">PlayPosit</span>
-        <select id="style_pp">
-          <option value="tint">Light orange background, black text</option>
-          <option value="white">White background, keep original colors</option>
-        </select></div>
+      <h4>Background &amp; text color display</h4>
+      <p class="instr">For each column, choose its text color, whether its background fills just its own cell or the whole row, and the background color. Yellow highlight is never removed.</p>
+      <div class="stylewrap">
+        <table class="styletbl">
+          <thead><tr><th>Type</th><th>Text color</th><th>Background format</th><th>Background color</th></tr></thead>
+          <tbody id="styleRows"></tbody>
+        </table>
+      </div>
+      <p class="mini" style="margin-top:8px">Colors marked “detected” come from the script's color coding. If two columns in the same row are both set to <strong>Fill row</strong>, the first in this order wins: Graphics, WeVideo, Video, Script. A cell set to <strong>Fill cell</strong> with its own color keeps that color. Heading rows always stay green.</p>
     </div>
 
     <!-- preview -->
@@ -282,7 +292,7 @@ function classifyColor(hex){
 
 /* hex swatches for UI */
 const COLOR_HEX = {green:'#4EA72E',blue:'#0F9ED5',red:'#C00000',pink:'#E83E8C',purple:'#7048B6'};
-const DEST_LABEL = {graphic:'Graphic',video:'Video',script:'Script',playposit:'PlayPosit',fdnotes:"FD's Notes",animation:'Animation'};
+const DEST_LABEL = {graphic:'Graphic',video:'Video',script:'Script',playposit:'WeVideo',fdnotes:"FD's Notes",animation:'Animation'};
 /* default color -> destination */
 const DEFAULT_COLOR_DEST = {green:'graphic',blue:'video',red:'playposit',pink:'animation',purple:'fdnotes'};
 /* default format -> destination */
@@ -445,10 +455,15 @@ async function parseDocx(arrayBuffer){
 }
 
 /* ---------- detect the set of colors present ---------- */
+// also records the most common actual hex per color bucket in detectedHex (used for text-color options)
+let detectedHex = {};
 function detectColors(paras){
-  const set=new Set();
+  const set=new Set(); const counts={};
   for(const p of paras){ if(p.blank) continue;
-    for(const r of p.runs){ if(r.cls!=='black') set.add(r.cls); } }
+    for(const r of p.runs){ if(r.cls!=='black'){ set.add(r.cls);
+      if(r.color && r.color!=='auto'){ const k=r.cls+'|'+r.color.toUpperCase(); counts[k]=(counts[k]||0)+1; } } } }
+  detectedHex={}; const best={};
+  for(const k in counts){ const [cls,hex]=k.split('|'); if(!best[cls]||counts[k]>best[cls]){ best[cls]=counts[k]; detectedHex[cls]='#'+hex; } }
   return [...set];
 }
 /* ---------- detect formats present (for format-coding mode) ---------- */
@@ -460,23 +475,54 @@ function detectFormats(paras){
 }
 
 /* ---------- heading detection ---------- */
-// Returns {level, title} or null. Uses explicit "Week/Module/Section/Part #" first, then Word heading styles.
-function detectHeading(para, levelTerms){
+// Returns {level, num, title, source, suspicious} or null.
+// 1) "Term #N: Title" lines (Module/Section/Part\u2026 and Week). The term must be followed by a number/letter
+//    and then a separator or the end of the line, so sentences like "Part B is the one that\u2026" or
+//    "Participants\u2026" are NOT headings.
+// 2) Word heading styles. Their level is learned from the script itself (styleMap): if "Part #\u2026" lines use
+//    Heading 4, then an unlabeled Heading 4 such as "Closing" is also treated as a Part-level heading.
+const HEADING_MAX_WORDS = 15;   // longer than this = a sentence, not a title
+const NUM_RE = '(\\d+[\\w.]*|[ivxlcdm]+|[a-z]|one|two|three|four|five|six|seven|eight|nine|ten)';
+const wordsIn = s => ((s||'').trim().match(/\S+/g)||[]).length;
+function termHeading(t, term, level){
+  const re=new RegExp('^'+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![a-z])\\s*(?:#\\s*)?'+NUM_RE+'?\\s*(?:[:\\-\u2013\u2014.]\\s*(.*))?$','i');
+  const m=t.match(re); if(!m) return null;
+  const title=(m[2]||'').trim();
+  if(wordsIn(title)>HEADING_MAX_WORDS) return null;
+  return {level, num:(m[1]||'').trim(), title:title||t, source:'term'};
+}
+function styleLevelOfPara(para){ return para.headingLevel || para.outlineLevel || null; }
+function detectHeading(para, levelTerms, styleMap){
   const t=para.full.trim();
-  // explicit term match e.g. "Module #1: Title", "Section #2 Foo", "Week #12: Bar"
   for(let i=0;i<levelTerms.length;i++){
     const term=levelTerms[i].trim(); if(!term) continue;
-    const re=new RegExp('^'+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*#?\\s*([\\w.]+)?\\s*[:\\-\u2013]?\\s*(.*)$','i');
-    const m=t.match(re);
-    if(m){ return {level:i+1, num:(m[1]||'').trim(), title:(m[2]||'').trim()||t}; }
+    const h=termHeading(t, term, i+1); if(h) return h;
   }
-  // Week always level 1 fallback
-  const wm=t.match(/^week\s*#?\s*([\w.]+)\s*[:\-\u2013]?\s*(.*)$/i);
-  if(wm) return {level:1,num:(wm[1]||'').trim(),title:(wm[2]||'').trim()||t};
-  // Word heading style
-  if(para.headingLevel) return {level:para.headingLevel,num:'',title:t};
-  if(para.outlineLevel) return {level:para.outlineLevel,num:'',title:t};
+  const wk=termHeading(t,'week',1); if(wk) return wk;   // Week is always level 1
+  const sl=styleLevelOfPara(para);
+  if(sl){
+    const n=wordsIn(t);
+    if(n>25) return null;                               // a whole sentence styled as a heading
+    const level=(styleMap && styleMap(sl)) || sl;
+    return {level, num:'', title:t, source:'style', suspicious: n>12 || /[.?!]$/.test(t)};
+  }
   return null;
+}
+// Learn "Word heading style level -> heading-system level" from lines that have both.
+function learnStyleMap(paras, levelTerms){
+  const counts={};
+  for(const p of paras){ if(p.blank) continue; const sl=styleLevelOfPara(p); if(!sl) continue;
+    const h=detectHeading(p, levelTerms, null); if(!h || h.source!=='term') continue;
+    (counts[sl]=counts[sl]||{})[h.level]=(counts[sl][h.level]||0)+1; }
+  const known={};
+  for(const sl in counts){ let best=null,bc=0; for(const L in counts[sl]) if(counts[sl][L]>bc){bc=counts[sl][L];best=+L;} known[sl]=best; }
+  const ks=Object.keys(known).map(Number);
+  return sl=>{
+    if(known[sl]) return known[sl];
+    if(!ks.length) return null;
+    const near=ks.reduce((a,b)=>Math.abs(b-sl)<Math.abs(a-sl)?b:a);   // extrapolate from nearest known style
+    return Math.max(1, known[near]+(sl-near));
+  };
 }
 
 /* ---------- segments by color ---------- */
@@ -625,14 +671,23 @@ function buildRows(paras, config){
     });
   }
 
-  for(const para of paras){
+  const styleMap=learnStyleMap(paras, config.levelTerms);
+  const hOverride=config.headingOverride||{};
+  const detected=[];   // every auto-detected heading, for the "fix headings" list
+  rows.detected=detected;
+  for(let pi=0; pi<paras.length; pi++){
+    const para=paras[pi];
     if(para.blank) continue;
 
-    // headings
-    const h = detectHeading(para, config.levelTerms);
+    // headings (user can override: 'text' = not a heading, or a level number)
+    let h = detectHeading(para, config.levelTerms, styleMap);
+    const ov=hOverride[pi];
+    if(h) detected.push({pi, level:h.level, title:h.title, full:para.full.trim(), source:h.source, suspicious:!!h.suspicious, ov:ov||null});
+    if(h && ov==='text') h=null;
+    else if(h && ov) h={...h, level:+ov};
     if(h){
       flushMerge();
-      const row=emptyRow('heading'); row.heading=h; row.level=h.level;
+      const row=emptyRow('heading'); row.heading={...h, pi}; row.level=h.level;
       rows.push(row);
       continue;
     }
@@ -779,33 +834,74 @@ function headingSegments(rows){
 
 // Given rows + an array of split row-indices (heading indices where a NEW video starts),
 // produce video groups. The first video always begins at the first content.
-// Returns [{code,title,minutes,type,startRow,endRow(exclusive)}]
-function splitVideos(rows, splitRowIndices, courseCode, week){
+// Returns [{code,title,minutes,type,startRow,endRow(exclusive),parent}] plus groups.parents.
+// With a divide level (e.g. 2 = Section), each video is titled by its Section heading and grouped under
+// the nearest higher heading before it (e.g. the Week/Module); codes are <parent#>.<video#>.
+// A stretch holding only parent headings and no script (e.g. "Module 5" right before "Section 1")
+// is folded into the next video instead of becoming an empty video.
+function splitVideos(rows, splitRowIndices, courseCode, week, divLevel){
   const headings = headingSegments(rows);
   if(!headings.length) return [];
-  // boundaries: always include the first heading row; add user splits; sort unique
   const bounds = Array.from(new Set([headings[0].rowIndex, ...splitRowIndices])).sort((a,b)=>a-b);
   const isInterview=t=>/interview|q&a|panel|discussion/i.test(t||'');
-  const groups=[];
+  let groups=[];
   for(let i=0;i<bounds.length;i++){
     const start=bounds[i];
     const end=(i+1<bounds.length)?bounds[i+1]:rows.length;
-    // title = first heading at/after start within [start,end)
-    let title='(untitled)', words=0;
+    // lead = the last heading before any content (e.g. "Section 1" after "Module 5"), used as the title
+    // of a video that has no heading of the divide level itself
+    let lead=null, seenContent=false, divHead=null, words=0;
     for(let r=start;r<end;r++){
       const row=rows[r];
-      if(row.type==='heading' && title==='(untitled)') title=row.heading.title;
-      if(row.type!=='heading' && row.script && row.script.length) words+=wordCount(row.script.map(s=>s.txt).join(' '));
+      if(row.type==='heading'){
+        if(!seenContent) lead={title:row.heading.title,row:r};
+        if(divLevel && !divHead && row.level===divLevel) divHead={title:row.heading.title,row:r};
+      } else { seenContent=true; if(row.script && row.script.length) words+=wordCount(row.script.map(s=>s.txt).join(' ')); }
     }
-    groups.push({startRow:start,endRow:end,title,words,minutes:minutesFromWords(words),
-      interview:isInterview(title)});
+    const t=divHead||lead||{title:'(untitled)',row:start};
+    groups.push({startRow:start,endRow:end,title:t.title,titleRow:t.row,divRow:divHead?divHead.row:null,words});
   }
-  // assign codes: lecture type=1, interview type=2; sequence increments across the week
-  let seq=0;
-  groups.forEach(g=>{ seq++; const type=g.interview?2:1;
-    g.code=`${courseCode||'COURSE'}-Week${week||'?'}-${type}.${seq}`;
-    g.type=g.interview?'Interview':'Lecture'; });
+  if(divLevel){
+    // Fold a stretch with no divide-level heading into the next video when it has no script (only parent
+    // headings), or when the next video continues under the same parent (e.g. a Section's intro before Part 1).
+    const merged=[];
+    for(let i=0;i<groups.length;i++){
+      const g=groups[i], nx=groups[i+1];
+      const nextSameParent = nx && rows[nx.startRow].type==='heading' && rows[nx.startRow].level>=divLevel;
+      if(nx && (g.words===0 || (g.divRow===null && nextSameParent))){ nx.startRow=g.startRow; nx.words+=g.words; continue; }
+      merged.push(g);
+    }
+    groups=merged;
+  }
+  groups.forEach(g=>{ g.minutes=minutesFromWords(g.words); g.interview=isInterview(g.title); g.type=g.interview?'Interview':'Lecture'; });
+  const prefix=`${courseCode||'COURSE'}-Week${week||'?'}-`;
+  const parents=[];
+  if(divLevel && divLevel>1){
+    // parent = most recent heading above the divide level, at or before the video's own heading
+    let curParent=null, r=0;
+    groups.forEach(g=>{
+      const upto=(g.divRow!==null?g.divRow:g.titleRow);
+      for(; r<=upto && r<rows.length; r++){ const row=rows[r]; if(row.type==='heading' && row.level<divLevel) curParent=row.heading.title; }
+      let p=parents[parents.length-1];
+      if(!p || p.title!==(curParent||'(no heading)')){ p={title:curParent||'(no heading)',minutes:0,videos:[]}; parents.push(p); }
+      p.videos.push(g); p.minutes+=g.minutes; g.parent=p.title;
+      g.code=`${prefix}${parents.length}.${p.videos.length}`;
+    });
+  } else if(divLevel===1){
+    groups.forEach((g,i)=>{ g.code=`${prefix}${i+1}`; });
+  } else {
+    // manual splits without a divide level: lecture type=1, interview type=2; sequence across the week
+    groups.forEach((g,i)=>{ g.code=`${prefix}${g.interview?2:1}.${i+1}`; });
+  }
+  groups.parents=parents;
   return groups;
+}
+// Text of the video list: parent headings with their videos indented under them.
+function videoListText(groups){
+  const line=g=>`${g.code}  ${g.title}  est. ${fmtMin(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}`;
+  if(groups.parents && groups.parents.length)
+    return groups.parents.map(p=>`${p.title}  (est. ${fmtMin(p.minutes)} min)\n`+p.videos.map(g=>'   '+line(g)).join('\n')).join('\n');
+  return groups.map(line).join('\n');
 }
 
 
@@ -814,10 +910,70 @@ function splitVideos(rows, splitRowIndices, courseCode, week){
    ============================================================ */
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// destination -> preview text color when white background (original colors)
-const DEST_PREVIEW_COLOR = {graphic:'#2E7D32',video:'#0F9ED5',playposit:'#C00000',script:'#1f2328',fdnotes:'#0F9ED5'};
-// tint backgrounds
-const TINT = {video:'#dbeafe',graphic:'#e5f4e0',script:'#e5f4e0',playposit:'#ffe8cc'};
+/* ---------- column styling: text color / fill cell-or-row / background color ---------- */
+// destination -> fallback text color in "keep original colors" mode when a run has no color of its own
+const DEST_DEFAULT_HEX = {graphic:'2E7D32',video:'0F9ED5',playposit:'C00000',fdnotes:'0F9ED5',script:'000000'};
+// light background tints (black text stays readable on these)
+const TINT_HEX = {blue:'DBEAFE',green:'E5F4E0',orange:'FFE8CC',red:'FDE2E2',pink:'FCE4EF',purple:'EDE4F7'};
+const PALETTE = ['green','blue','red','pink','purple','orange'];
+const PALETTE_TEXT_HEX = {...COLOR_HEX, orange:'#E97132'};
+const STYLE_COLS = [['video','Video'],['graphic','Graphics'],['script','Script'],['playposit','WeVideo']];
+// defaults reproduce the previous look
+const DEFAULT_STYLE = {
+  video:    {text:'black',    fill:'cell', bg:'blue'},
+  graphic:  {text:'black',    fill:'cell', bg:'green'},
+  script:   {text:'original', fill:'cell', bg:'white'},
+  playposit:{text:'black',    fill:'cell', bg:'orange'},
+};
+const ROW_FILL_PRIORITY = ['graphic','playposit','video','script'];
+const cap = s => s[0].toUpperCase()+s.slice(1);
+
+// hex (no #) for a palette color used as TEXT: the script's own shade if detected, else the swatch
+function paletteTextHex(key){ return String(detectedHex[key]||PALETTE_TEXT_HEX[key]||'#000000').replace('#','').toUpperCase(); }
+
+// Background hex (no #) for each cell of a data row, or null for none.
+function cellFills(row, styles, noPp){
+  const has={video:row.video.length>0, graphic:row.graphics.length>0, script:row.script.length>0,
+             playposit:!noPp && row.playposit.length>0};
+  let rowFill=null;
+  for(const k of ROW_FILL_PRIORITY){ const s=styles[k];
+    if(has[k] && s.fill==='row' && s.bg!=='white'){ rowFill=TINT_HEX[s.bg]; break; } }
+  const out={};
+  STYLE_COLS.forEach(([k])=>{ const s=styles[k];
+    const own=(has[k] && s.bg!=='white') ? TINT_HEX[s.bg] : null;
+    out[k] = (own && s.fill==='cell') ? own : (rowFill || own);
+  });
+  return out;
+}
+// Text for each cell of a heading row + which cell carries the Word heading style.
+// Graphics gets the title; Script/WeVideo get the title (with the number when "Number with the title" is chosen).
+function headingCells(row, cfg){
+  const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
+  const numLabel=`${label}${row.heading.num?(' '+row.heading.num):''}`;
+  const title=row.heading.title;
+  const numInVideo=(cfg.headingPlace==='videoonly');
+  const withNum=numInVideo?title:(numLabel+': '+title);
+  const on=new Set(cfg.headingCols);
+  const ws=cfg.wordStyles[row.level-1]||{style:'none',col:null};
+  const styleLevel=/^H[1-4]$/.test(ws.style) ? +ws.style.slice(1) : null;
+  return {
+    video: numInVideo?numLabel:'',
+    graphic: on.has('graphic')?title:'',
+    script: on.has('script')?withNum:'',
+    playposit: (!cfg.noPp && on.has('playposit'))?withNum:'',
+    styleCol: styleLevel && on.has(ws.col) ? ws.col : null,
+    styleLevel,
+  };
+}
+// Text color hex (no #) for a run (r may be null for markers/prefixes).
+function textHexFor(r, seg, style){
+  if(style.text==='black') return '000000';
+  if(style.text==='original'){
+    if(r && r.color && r.color!=='auto') return String(r.color).replace('#','').toUpperCase();
+    return DEST_DEFAULT_HEX[seg.dest] || '000000';
+  }
+  return paletteTextHex(style.text);
+}
 
 function cleanRun(r, cleanSet){
   // return a shallow copy with cleaned formatting flags
@@ -827,17 +983,6 @@ function cleanRun(r, cleanSet){
   if(cleanSet.has('underline')) o.underline=false;
   if(cleanSet.has('strike')) o.strike=false;
   return o; // highlight always kept
-}
-
-function segColorForCell(seg, colMode){
-  if(colMode==='tint') return '#000000';
-  return DEST_PREVIEW_COLOR[seg.dest] || '#1f2328';
-}
-// per-run color for preview: tint => black; white => run's own color, else destination color
-function runColorForCell(r, seg, colMode){
-  if(colMode==='tint') return '#000000';
-  if(r && r.color) return '#'+String(r.color).replace('#','');
-  return DEST_PREVIEW_COLOR[seg.dest] || '#1f2328';
 }
 
 function fmtRunHtml(r, color){
@@ -852,20 +997,20 @@ function fmtRunHtml(r, color){
   return `<span style="color:${color}${hl}">${t}</span>`;
 }
 
-function segsToHtml(segs, colMode, cleanSet){
+function segsToHtml(segs, style, cleanSet){
   if(!segs || !segs.length) return '';
   let html=''; let open=false;
   segs.forEach((s,i)=>{
-    const color=segColorForCell(s,colMode);
+    const color='#'+textHexFor(null,s,style);
     const startNew=(s.lineStart===true)||i===0;
     if(startNew){ if(open) html+='</div>';
       const al=s.align==='center'?'center':(s.align==='right'?'right':(s.align==='both'?'justify':'left'));
       html+=`<div style="text-align:${al}">`; open=true;
-      if(s.markerText) html+=`<span style="color:${color}">${esc(s.markerText).replace(/\t/g,' ')}</span>`;
+      if(s.markerText) html+=`<span style="color:#${textHexFor(s.runs&&s.runs[0],s,style)}">${esc(s.markerText).replace(/\t/g,' ')}</span>`;
       if(s.prefix) html+=`<span style="color:${color}">${esc(s.prefix)}</span>`;
     }
     const rs=(s.runs&&s.runs.length)?s.runs:[{txt:s.txt}];
-    rs.forEach(r=> html+=fmtRunHtml(cleanRun(r,cleanSet), runColorForCell(r,s,colMode)));
+    rs.forEach(r=> html+=fmtRunHtml(cleanRun(r,cleanSet), '#'+textHexFor(r,s,style)));
     if(s.prefixClose && i===segs.length-1) html+=`<span style="color:${color}">${esc(s.prefixClose)}</span>`;
   });
   if(open) html+='</div>';
@@ -875,33 +1020,24 @@ function segsToHtml(segs, colMode, cleanSet){
 function renderPreview(rows, cfg){
   const cleanSet=cfg.cleanSet;
   const ppCol = !cfg.noPp;
-  let html='<table><tr><th>Videos</th><th>Graphics</th><th>Script</th>'+(ppCol?'<th>PlayPosit</th>':'')+'</tr>';
+  let html='<table><tr><th>Videos</th><th>Graphics</th><th>Script</th>'+(ppCol?'<th>WeVideo</th>':'')+'</tr>';
   rows.forEach(row=>{
     if(row.type==='heading'){
-      const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
-      const numLabel=`${esc(label)}${row.heading.num?(' '+esc(row.heading.num)):''}`;
-      const title=esc(row.heading.title);
-      const numInVideo=(cfg.headingPlace==='videoonly');
-      const scriptText=numInVideo?title:(numLabel+': '+title);
+      const h=headingCells(row,cfg);
+      // small tag shows which cell gets the Word heading style
+      const td=k=>`<td><strong>${esc(h[k])}</strong>${(h.styleCol===k&&h[k])?` <span class="pill" title="Word style">H${h.styleLevel}</span>`:''}</td>`;
       html+=`<tr style="background:#e5f4e0">`
-        +`<td><strong>${numInVideo?numLabel:''}</strong></td>`
-        +`<td><strong>${title}</strong></td>`
-        +`<td><strong>${scriptText}</strong></td>`
-        +(ppCol?`<td></td>`:'')+`</tr>`;
+        +`<td><strong>${esc(h.video)}</strong></td>`+td('graphic')+td('script')
+        +(ppCol?td('playposit'):'')+`</tr>`;
       return;
     }
-    const scriptTintActive = (cfg.styleScript==='tint' && row.graphics.length>0);
-    const effScriptStyle = scriptTintActive ? 'tint' : (cfg.styleScript==='tint' ? 'white' : cfg.styleScript);
-    const v=segsToHtml(row.video,cfg.styleVideo,cleanSet);
-    const g=segsToHtml(row.graphics,cfg.styleGraphic,cleanSet);
-    const sc=segsToHtml(row.script,effScriptStyle,cleanSet);
-    const pp=segsToHtml(row.playposit,cfg.stylePp,cleanSet);
-    const bg=(m,d)=> m==='tint'?`background:${TINT[d]}`:'';
+    const st=cfg.styles, fill=cellFills(row,st,cfg.noPp);
+    const bg=k=> fill[k]?`background:#${fill[k]}`:'';
     html+=`<tr>`
-      +`<td style="${row.video.length?bg(cfg.styleVideo,'video'):''}">${v}</td>`
-      +`<td style="${row.graphics.length?bg(cfg.styleGraphic,'graphic'):''}">${g}</td>`
-      +`<td style="${(row.script.length&&scriptTintActive)?bg('tint','script'):''}">${sc}</td>`
-      +(ppCol?`<td style="${row.playposit.length?bg(cfg.stylePp,'playposit'):''}">${pp}</td>`:'')+`</tr>`;
+      +`<td style="${bg('video')}">${segsToHtml(row.video,st.video,cleanSet)}</td>`
+      +`<td style="${bg('graphic')}">${segsToHtml(row.graphics,st.graphic,cleanSet)}</td>`
+      +`<td style="${bg('script')}">${segsToHtml(row.script,st.script,cleanSet)}</td>`
+      +(ppCol?`<td style="${bg('playposit')}">${segsToHtml(row.playposit,st.playposit,cleanSet)}</td>`:'')+`</tr>`;
   });
   html+='</table>';
   return html;
@@ -921,12 +1057,11 @@ async function buildDocx(rows, cfg, videoLabel, summary){
   const {Document,Packer,Paragraph,TextRun,Tab,Table,TableRow,TableCell,WidthType,BorderStyle,ShadingType}=D;
   const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
   const borders={top:border,bottom:border,left:border,right:border};
-  const colW = cfg.noPp ? [2400,5000,7000] : [2200,4400,6400,1400];
+  const colW = cfg.noPp ? [2400,5000,7000] : [2300,3300,5300,3500];
   const totalW=14400;
   const margins={top:60,bottom:60,left:100,right:100};
   const cleanSet=cfg.cleanSet;
 
-  function shadeHex(m,d){ return m==='tint' ? {video:'DBEAFE',graphic:'E5F4E0',script:'E5F4E0',playposit:'FFE8CC'}[d] : undefined; }
   function cell(children,w,shade){
     return new TableCell({borders,width:{size:w,type:WidthType.DXA},margins,
       shading:shade?{fill:shade,type:ShadingType.CLEAR}:undefined, children});
@@ -938,20 +1073,9 @@ async function buildDocx(rows, cfg, videoLabel, summary){
   }
   function alignFor(a){ if(a==='center')return D.AlignmentType.CENTER; if(a==='right')return D.AlignmentType.RIGHT; if(a==='both')return D.AlignmentType.JUSTIFIED; return undefined; }
   function fontFor(r){ return cfg.fontMode==='convert' ? cfg.fontChoice : (r.font || cfg.scriptFont || undefined); }
-  function colorForDocx(seg){
-    if(seg.__forceBlack) return '000000';
-    return {graphic:'2E7D32',video:'0F9ED5',playposit:'C00000',fdnotes:'0F9ED5',script:'000000'}[seg.dest]||'000000';
-  }
-  // resolve a run's color: tint mode => black; white mode => run's own color, else destination color
-  function resolveColor(r, seg, colMode){
-    if(colMode==='tint') return '000000';
-    if(r && r.color) return String(r.color).replace('#','').toUpperCase();
-    return colorForDocx(seg);
-  }
-
-  function textRuns(r, seg, colMode){
+  function textRuns(r, seg, style){
     const cr=cleanRun(r,cleanSet);
-    const colorHex=resolveColor(cr, seg, colMode);
+    const colorHex=textHexFor(cr, seg, style);
     const parts=(cr.txt||'').split('\t');
     const out=[];
     parts.forEach((part,idx)=>{
@@ -972,17 +1096,17 @@ async function buildDocx(rows, cfg, videoLabel, summary){
     return out;
   }
 
-  function paras(segs, colMode){
+  function paras(segs, style){
     if(!segs||!segs.length) return [new Paragraph({children:[new TextRun('')]})];
     const out=[]; let cur=null;
     segs.forEach((s,i)=>{
-      const markerColor = (colMode==='tint') ? '000000' : colorForDocx(s);
+      const markerColor = textHexFor(null, s, style);
       const startNew=(s.lineStart===true)||i===0;
       if(startNew){ cur={children:[],align:alignFor(s.align)}; out.push(cur); }
-      if(s.markerText) textRuns({txt:s.markerText, color:(colMode==='tint'?null:(s.runs&&s.runs[0]&&s.runs[0].color))}, s, colMode).forEach(t=>cur.children.push(t));
+      if(s.markerText) textRuns({txt:s.markerText, color:(s.runs&&s.runs[0]&&s.runs[0].color)||null}, s, style).forEach(t=>cur.children.push(t));
       if(s.prefix) cur.children.push(new TextRun({text:s.prefix,color:markerColor}));
       const rs=(s.runs&&s.runs.length)?s.runs:[{txt:s.txt}];
-      rs.forEach(r=> textRuns(r,s,colMode).forEach(t=>cur.children.push(t)));
+      rs.forEach(r=> textRuns(r,s,style).forEach(t=>cur.children.push(t)));
       if(s.prefixClose && i===segs.length-1) cur.children.push(new TextRun({text:s.prefixClose,color:markerColor}));
     });
     return out.map(o=>new Paragraph({children:o.children.length?o.children:[new TextRun('')],alignment:o.align}));
@@ -1002,36 +1126,33 @@ async function buildDocx(rows, cfg, videoLabel, summary){
       cell([new Paragraph({children:[new TextRun({text:'Graphics',bold:true})]})],colW[1],'E8E6DF'),
       cell([new Paragraph({children:[new TextRun({text:'Script',bold:true})]})],colW[2],'E8E6DF'),
     ];
-    if(!cfg.noPp) cells.push(cell([new Paragraph({children:[new TextRun({text:'PlayPosit',bold:true})]})],colW[3],'E8E6DF'));
+    if(!cfg.noPp) cells.push(cell([new Paragraph({children:[new TextRun({text:'WeVideo',bold:true})]})],colW[3],'E8E6DF'));
     return new TableRow({children:cells});
   }
 
   function makeRow(row){
     if(row.type==='heading'){
-      const label=(cfg.levelTerms[row.level-1]||('Level '+row.level));
-      const numLabel = `${label}${row.heading.num?(' '+row.heading.num):''}`;
-      const title = row.heading.title;
-      const numInVideo = (cfg.headingPlace==='videoonly');
-      const scriptText = numInVideo ? title : (numLabel+': '+title);
+      const h=headingCells(row,cfg);
+      const HL=[null,D.HeadingLevel.HEADING_1,D.HeadingLevel.HEADING_2,D.HeadingLevel.HEADING_3,D.HeadingLevel.HEADING_4];
+      const hp=k=>{ const o={children:[new TextRun({text:h[k]||'',bold:true,color:'000000'})]};
+        if(h.styleCol===k && h[k]) o.heading=HL[h.styleLevel];
+        return new Paragraph(o); };
       const hc=[
-        cell([new Paragraph({children:[new TextRun({text: numInVideo ? numLabel : '', bold:true})]})],colW[0],'E5F4E0'),
-        cell([new Paragraph({children:[new TextRun({text:title,bold:true})]})],colW[1],'E5F4E0'),
-        cell([new Paragraph({children:[new TextRun({text:scriptText,bold:true})]})],colW[2],'E5F4E0'),
+        cell([hp('video')],colW[0],'E5F4E0'),
+        cell([hp('graphic')],colW[1],'E5F4E0'),
+        cell([hp('script')],colW[2],'E5F4E0'),
       ];
-      if(!cfg.noPp) hc.push(cell([new Paragraph('')],colW[3],'E5F4E0'));
+      if(!cfg.noPp) hc.push(cell([hp('playposit')],colW[3],'E5F4E0'));
       return new TableRow({children:hc});
     }
-    // Script green tint applies ONLY when the row also has a graphic; otherwise the Script
-    // cell stays white. The text color mode must match the actual background of THIS row.
-    const scriptTintActive = (cfg.styleScript==='tint' && row.graphics.length>0);
-    const effScriptStyle = scriptTintActive ? 'tint' : (cfg.styleScript==='tint' ? 'white' : cfg.styleScript);
-    const scriptShade = (row.script.length && scriptTintActive) ? shadeHex('tint','script') : undefined;
+    // per-cell background: own color for "Fill cell", or the row color when a column is set to "Fill row"
+    const st=cfg.styles, fill=cellFills(row,st,cfg.noPp);
     const dc=[
-      cell(paras(row.video,cfg.styleVideo), colW[0], row.video.length?shadeHex(cfg.styleVideo,'video'):undefined),
-      cell(paras(row.graphics,cfg.styleGraphic), colW[1], row.graphics.length?shadeHex(cfg.styleGraphic,'graphic'):undefined),
-      cell(paras(row.script,effScriptStyle), colW[2], scriptShade),
+      cell(paras(row.video,st.video), colW[0], fill.video||undefined),
+      cell(paras(row.graphics,st.graphic), colW[1], fill.graphic||undefined),
+      cell(paras(row.script,st.script), colW[2], fill.script||undefined),
     ];
-    if(!cfg.noPp) dc.push(cell(paras(row.playposit,cfg.stylePp), colW[3], row.playposit.length?shadeHex(cfg.stylePp,'playposit'):undefined));
+    if(!cfg.noPp) dc.push(cell(paras(row.playposit,st.playposit), colW[3], fill.playposit||undefined));
     return new TableRow({children:dc});
   }
 
@@ -1050,7 +1171,8 @@ async function buildDocx(rows, cfg, videoLabel, summary){
   } else {
     // one table per video group, each preceded by its video-code heading
     videos.forEach((g,gi)=>{
-      children.push(new Paragraph({children:[new TextRun({text:`${g.code}  (${g.title})  est. ${Math.round(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}`,bold:true,size:24,color:'2c557f'})]}));
+      // video title line = Word "Heading 1" (shows in the Navigation pane)
+      children.push(new Paragraph({heading:D.HeadingLevel.HEADING_1, children:[new TextRun({text:`${g.code}  (${g.title})  est. ${Math.round(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}`,bold:true,size:24,color:'2c557f'})]}));
       const slice=rows.slice(g.startRow,g.endRow);
       const bodyRows=slice.map(makeRow);
       const tblRows = gi===0 ? [headerRowNew(),metaRow,...bodyRows] : [headerRowNew(),...bodyRows];
@@ -1060,7 +1182,14 @@ async function buildDocx(rows, cfg, videoLabel, summary){
   }
 
   const doc=new Document({
-    styles:{default:{document:{run:{font:defFont,size:20}}}},
+    // Heading styles kept compact so they fit table cells; Heading 1 matches the video title line.
+    styles:{default:{
+      document:{run:{font:defFont,size:20}},
+      heading1:{run:{font:defFont,size:24,bold:true,color:'2C557F'},paragraph:{spacing:{before:120,after:60}}},
+      heading2:{run:{font:defFont,size:20,bold:true,color:'000000'},paragraph:{spacing:{before:0,after:0}}},
+      heading3:{run:{font:defFont,size:20,bold:true,color:'000000'},paragraph:{spacing:{before:0,after:0}}},
+      heading4:{run:{font:defFont,size:20,bold:true,color:'000000'},paragraph:{spacing:{before:0,after:0}}},
+    }},
     sections:[{
       properties:{page:{size:{width:12240,height:15840,orientation:D.PageOrientation.LANDSCAPE},margin:{top:720,right:720,bottom:720,left:720}}},
       children
@@ -1094,10 +1223,49 @@ function readConfig(){
     levelTerms:levelTerms.slice(),
     headingPlace:document.querySelector('input[name=headingPlace]:checked').value,
     graphicDup:document.querySelector('input[name=graphicDup]:checked').value,
-    styleVideo:$('style_video').value, styleGraphic:$('style_graphic').value,
-    styleScript:$('style_script').value, stylePp:$('style_pp').value,
+    styles: readStyles(),
+    headingCols: headingCols(),
+    headingOverride: {...headingOverride},
+    // per level: Word style ('video'|'none'|'H1'..'H4') and which column carries it
+    wordStyles: levelTerms.map((_,i)=>({style:wordStyleFor(i+1), col:wordStyleColFor(i+1)})),
     noPp: $('noPlayposit').checked,
   };
+}
+
+/* ----- background & text color table ----- */
+function readStyles(){
+  const out={};
+  STYLE_COLS.forEach(([k])=>{ const d=DEFAULT_STYLE[k];
+    const v=id=>{ const el=$(id); return el?el.value:null; };
+    out[k]={text:v(`st_${k}_text`)||d.text, fill:v(`st_${k}_fill`)||d.fill, bg:v(`st_${k}_bg`)||d.bg};
+  });
+  return out;
+}
+function buildStyleRows(){
+  const prev = $('st_video_text') ? readStyles() : null;   // keep the user's choices on rebuild
+  const box=$('styleRows'); box.innerHTML='';
+  const det=new Set(detectedColors);
+  const opt=(val,label,sel)=>`<option value="${val}"${val===sel?' selected':''}>${label}</option>`;
+  STYLE_COLS.forEach(([k,label])=>{
+    const cur=(prev&&prev[k])||DEFAULT_STYLE[k];
+    // text: black, original, then each detected color
+    let t=opt('black','Black',cur.text)+opt('original','Keep original colors',cur.text);
+    const textColors=detectedColors.filter(c=>PALETTE.includes(c));
+    if(!['black','original'].includes(cur.text) && !textColors.includes(cur.text)) textColors.push(cur.text);
+    textColors.forEach(c=> t+=opt(c, cap(c)+(det.has(c)?' (detected)':''), cur.text));
+    const f=opt('cell','Fill cell',cur.fill)+opt('row','Fill row',cur.fill);
+    // background: white, detected colors' light tints first, then the rest
+    const bgOrder=[...PALETTE.filter(c=>det.has(c)), ...PALETTE.filter(c=>!det.has(c))];
+    let b=opt('white','White (no fill)',cur.bg);
+    bgOrder.forEach(c=> b+=opt(c, 'Light '+c+(det.has(c)?' (detected)':''), cur.bg));
+    const tr=document.createElement('tr');
+    if(k==='playposit'){ tr.id='ppStyleRow'; if($('noPlayposit').checked) tr.style.display='none'; }
+    tr.innerHTML=`<td>${label}</td>`
+      +`<td><select id="st_${k}_text" aria-label="${label} text color">${t}</select></td>`
+      +`<td><select id="st_${k}_fill" aria-label="${label} background format">${f}</select></td>`
+      +`<td><select id="st_${k}_bg" aria-label="${label} background color">${b}</select></td>`;
+    box.appendChild(tr);
+  });
 }
 
 /* ----- build the color-map rows from detected colors ----- */
@@ -1137,18 +1305,107 @@ function buildFormatMap(){
   });
 }
 
-/* ----- level rows ----- */
+/* ----- detected-headings list: turn a false heading back into text, or change its level ----- */
+let headingOverride={};   // paragraph index -> 'text' | level number
+function renderHeadingFix(rows, cfg){
+  const list=rows.detected||[];
+  const flagged=list.filter(d=>d.suspicious && d.ov!=='text').length;
+  $('hdFixCount').textContent=`(${list.length} found${flagged?` · ⚠️ ${flagged} to check`:''})`;
+  const opt=(v,l,sel)=>`<option value="${v}"${String(v)===String(sel)?' selected':''}>${l}</option>`;
+  let html='';
+  list.forEach(d=>{
+    const cur=d.ov||d.level;
+    let sel=`<select data-hfix="${d.pi}" style="width:230px;flex:0 0 auto;padding:5px 8px;font-size:.82rem">`;
+    cfg.levelTerms.forEach((t,i)=>{ sel+=opt(i+1,`Level ${i+1} — ${esc(t||'')}`+((d.level===i+1&&!d.ov)?' (auto)':''),cur); });
+    if(d.level>cfg.levelTerms.length) sel+=opt(d.level,`Level ${d.level}`+(d.ov?'':' (auto)'),cur);
+    sel+=opt('text','Not a heading (keep as text)',cur)+'</select>';
+    const off=(d.ov==='text');
+    const txt=d.full.length>120?d.full.slice(0,120)+'…':d.full;
+    html+=`<div style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line)">${sel}`
+      +`<span style="font-size:.84rem;${off?'color:var(--muted);text-decoration:line-through':''};padding-left:${(Math.min(+cur||1,4)-1)*12}px">`
+      +`${(d.suspicious&&!off)?'⚠️ ':''}${esc(txt)}</span></div>`;
+  });
+  $('hdFixList').innerHTML=html||'<p class="mini">No headings detected.</p>';
+  if(flagged && !renderHeadingFix.opened){ $('hdFix').open=true; renderHeadingFix.opened=true; }
+  $('hdFixList').querySelectorAll('[data-hfix]').forEach(s=>s.onchange=()=>{
+    const pi=+s.dataset.hfix, d=list.find(x=>x.pi===pi);
+    if(s.value==='text') headingOverride[pi]='text';
+    else if(+s.value===d.level) delete headingOverride[pi];
+    else headingOverride[pi]=+s.value;
+    divideDirty=true; refresh();
+  });
+}
+
+/* ----- heading levels: name / divide video by / Word heading style / column the style goes in ----- */
+let divideLevel=null;        // heading level that divides the week into videos (null = none)
+let divideDirty=false;       // recompute splitSet from divideLevel on next refresh
+let wordStyleOverride={};    // level -> 'none'|'H1'..'H4' chosen by the user
+let wordStyleColOverride={}; // level -> 'graphic'|'script'|'playposit'
+const HCOL_LABEL={graphic:'Graphics',script:'Script',playposit:'WeVideo'};
+
+function headingCols(){
+  const noPp=$('noPlayposit').checked;
+  return [...document.querySelectorAll('.hcol:checked')].map(c=>c.value).filter(v=>!(noPp&&v==='playposit'));
+}
+// Heading 1 is the video title line; levels below the divide level default to Heading 2, 3, 4.
+function defaultWordStyle(lv){
+  if(divideLevel){ if(lv<divideLevel) return 'none'; return 'H'+Math.min(4, lv-divideLevel+1); }
+  return 'H'+Math.min(4, lv+1);
+}
+function wordStyleFor(lv){ return lv===divideLevel ? 'video' : (wordStyleOverride[lv] || defaultWordStyle(lv)); }
+function wordStyleColFor(lv){
+  const cols=headingCols(); const want=wordStyleColOverride[lv]||'graphic';
+  return cols.includes(want) ? want : (cols[0]||null);
+}
+function setDivideLevel(lv){
+  divideLevel = lv || null; wordStyleOverride={}; divideDirty=true;
+  if(divideLevel) splitOn=true;
+  buildLevelRows(); refresh();
+}
+
 function buildLevelRows(){
   const box=$('levelRows'); box.innerHTML='';
+  const cols=headingCols();
+  const opt=(val,label,sel)=>`<option value="${val}"${val===sel?' selected':''}>${label}</option>`;
   levelTerms.forEach((term,i)=>{
-    const row=document.createElement('div'); row.className='lvl-row';
-    row.innerHTML=`<span class="lvlnum">Level ${i+1}</span>`
-      +`<input type="text" value="${term.replace(/"/g,'&quot;')}" data-i="${i}">`
-      +`<button class="btn sec" data-rm="${i}">Remove</button>`;
-    box.appendChild(row);
+    const lv=i+1, ws=wordStyleFor(lv), wc=wordStyleColFor(lv);
+    const styleCell = ws==='video'
+      ? `<span class="mini"><strong>Heading 1</strong> — video title line</span>`
+      : `<select data-ws="${lv}" aria-label="Level ${lv} Word style">${opt('none','No heading style',ws)}${[1,2,3,4].map(n=>opt('H'+n,'Heading '+n,ws)).join('')}</select>`;
+    const colCell = (ws==='video'||ws==='none'||!cols.length)
+      ? `<span class="mini">—</span>`
+      : `<select data-wc="${lv}" aria-label="Level ${lv} style column">${cols.map(c=>opt(c,HCOL_LABEL[c],wc)).join('')}</select>`;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>Level ${lv}</td>`
+      +`<td><input type="text" value="${term.replace(/"/g,'&quot;')}" data-i="${i}" style="width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></td>`
+      +`<td style="text-align:center"><input type="checkbox" data-div="${lv}" ${divideLevel===lv?'checked':''} aria-label="Divide video by level ${lv}"></td>`
+      +`<td>${styleCell}</td><td>${colCell}</td>`
+      +`<td><button class="btn sec" data-rm="${i}">Remove</button></td>`;
+    box.appendChild(tr);
   });
-  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{ levelTerms[+e.target.dataset.i]=e.target.value; refresh(); }));
-  box.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',e=>{ const i=+e.target.dataset.rm; if(levelTerms.length>1){ levelTerms.splice(i,1); buildLevelRows(); refresh(); } }));
+  box.querySelectorAll('input[data-i]').forEach(inp=>inp.addEventListener('input',e=>{ levelTerms[+e.target.dataset.i]=e.target.value; divideDirty=true; refresh(); }));
+  box.querySelectorAll('[data-div]').forEach(cb=>cb.addEventListener('change',e=>{ setDivideLevel(e.target.checked ? +e.target.dataset.div : null); }));
+  box.querySelectorAll('[data-ws]').forEach(s=>s.addEventListener('change',e=>{ wordStyleOverride[+e.target.dataset.ws]=e.target.value; buildLevelRows(); refresh(); }));
+  box.querySelectorAll('[data-wc]').forEach(s=>s.addEventListener('change',e=>{ wordStyleColOverride[+e.target.dataset.wc]=e.target.value; refresh(); }));
+  box.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',e=>{ const i=+e.target.dataset.rm; if(levelTerms.length>1){
+    levelTerms.splice(i,1);
+    if(divideLevel===i+1) divideLevel=null; else if(divideLevel>i+1) divideLevel--;
+    wordStyleOverride={}; wordStyleColOverride={}; divideDirty=true;
+    buildLevelRows(); refresh(); } }));
+}
+
+/* ----- quick split: a new video at every heading of `level` (and any higher-level heading) -----
+   If parent headings sit directly above it (no content in between, e.g. "Module 7" then "Section 1"),
+   the split moves up to the first of them so the parent heading goes with its first child. */
+function splitsForLevel(headings, level){
+  const out=new Set();
+  headings.forEach((h,i)=>{
+    if(h.level>level || i===0) return;
+    let j=i;
+    while(j>0 && headings[j-1].rowIndex===headings[j].rowIndex-1 && headings[j-1].level<headings[j].level) j--;
+    if(j>0) out.add(headings[j].rowIndex);
+  });
+  return out;
 }
 
 /* ----- dashboard ----- */
@@ -1160,7 +1417,7 @@ function renderDashboard(rows, cfg){
     +stat(c.graphic,'Graphic elements')
     +stat(c.animation,'Animations')
     +stat(c.video,'Video elements')
-    +(cfg.noPp?'':stat(c.playposit,'PlayPosit elements'))
+    +(cfg.noPp?'':stat(c.playposit,'WeVideo elements'))
     +stat(c.fdnotes,'FD notes')
     +stat(sum.totalWords,'Script words')
     +stat(Math.round(sum.totalMinutes)+' min','Teleprompter @ '+WPM+' wpm')
@@ -1187,6 +1444,20 @@ function renderDashboard(rows, cfg){
     lastVideoGroups=null;
   } else {
     // manual split UI: list heading segments with "add split here" between them
+    // quick actions: one button per heading level used in this script
+    const levelsUsed=[...new Set(headings.map(h=>h.level))].sort((a,b)=>a-b);
+    const sameSet=(a,b)=> a.size===b.size && [...a].every(x=>b.has(x));
+    html+=`<div style="margin-top:10px"><strong>Quick split</strong> <span class="mini">Start a new video at every heading of a level, then adjust below.</span></div>`;
+    html+='<div style="margin-top:6px">';
+    levelsUsed.forEach(lv=>{
+      const term=(cfg.levelTerms[lv-1]||'').trim() || ('Level '+lv);
+      const n=headings.filter(h=>h.level===lv).length;
+      const active=(divideLevel===lv);
+      const adjusted=active && !sameSet(splitSet, splitsForLevel(headings,lv));
+      html+=`<button class="btn sec" data-splitlevel="${lv}" style="margin:0 6px 6px 0${active?';background:#dbeafe':''}">`
+        +`By level ${lv} — ${esc(term)} <span class="mini">(${n})</span>${active?(adjusted?' ✓ <span class="mini">adjusted</span>':' ✓'):''}</button>`;
+    });
+    html+=`<button class="btn sec" data-splitclear="1" style="margin:0 6px 6px 0">Clear splits</button></div>`;
     html+=`<div style="margin-top:10px"><strong>Place splits between sections.</strong> <span class="mini">Each split starts a new video &amp; table.</span></div>`;
     html+='<div id="splitList" style="margin-top:8px">';
     headings.forEach((hd,i)=>{
@@ -1203,15 +1474,10 @@ function renderDashboard(rows, cfg){
     });
     html+='</div>';
 
-    const groups=splitVideos(rows, [...splitSet], course, week);
+    const groups=splitVideos(rows, [...splitSet], course, week, divideLevel);
     lastVideoGroups=groups;
-    html+=`<div style="margin-top:14px"><strong>Video list &amp; tables</strong></div>`;
-    html+='<div class="vlist">'+ groups.map(g=>{
-      const secs=[];
-      for(let r=g.startRow;r<g.endRow;r++){ if(rows[r].type==='heading') secs.push(rows[r].heading.title); }
-      return `${g.code}  (${esc(g.title)})  est. ${Math.round(g.minutes)} min${g.type==='Interview'?'  [Interview]':''}\n`
-        + `    [table: ${secs.map(esc).join(' · ')||'—'}]`;
-    }).join('\n') +'</div>';
+    html+=`<div style="margin-top:14px"><strong>Video list</strong> <span class="mini">${groups.length} video${groups.length===1?'':'s'} · each video = its own table in the Word doc</span></div>`;
+    html+='<div class="vlist">'+ esc(videoListText(groups)) +'</div>';
   }
 
   html+=`<div style="margin-top:10px"><button class="btn sec" id="copySummary">Copy summary</button> <button class="btn sec" id="copyVideos">Copy video list</button></div>`;
@@ -1219,14 +1485,16 @@ function renderDashboard(rows, cfg){
   $('dashboard').innerHTML=html;
 
   // wire split toggle + add/remove split links
-  const st=$('splitToggle'); if(st) st.onchange=()=>{ splitOn=st.checked; refresh(); };
+  const st=$('splitToggle'); if(st) st.onchange=()=>{ splitOn=st.checked; if(!splitOn && divideLevel){ divideLevel=null; wordStyleOverride={}; buildLevelRows(); } refresh(); };
   $('dashboard').querySelectorAll('[data-split]').forEach(a=>a.onclick=e=>{e.preventDefault(); splitSet.add(+a.dataset.split); refresh();});
   $('dashboard').querySelectorAll('[data-unsplit]').forEach(a=>a.onclick=e=>{e.preventDefault(); splitSet.delete(+a.dataset.unsplit); refresh();});
+  $('dashboard').querySelectorAll('[data-splitlevel]').forEach(b=>b.onclick=()=>setDivideLevel(+b.dataset.splitlevel));
+  $('dashboard').querySelectorAll('[data-splitclear]').forEach(b=>b.onclick=()=>setDivideLevel(null));
 
   $('copySummary').onclick=()=>{ navigator.clipboard.writeText($('dashboard').innerText); $('copySummary').textContent='Copied ✓'; setTimeout(()=>$('copySummary').textContent='Copy summary',1500); };
   $('copyVideos').onclick=()=>{
     const txt = lastVideoGroups
-      ? lastVideoGroups.map(g=>`${g.code} (${g.title}) est. ${Math.round(g.minutes)} min${g.type==='Interview'?' [Interview]':''}`).join('\n')
+      ? videoListText(lastVideoGroups)
       : videoList(sum.toc,course,week,2).map(v=>`${v.code} (${v.title}) est. ${Math.round(v.minutes)} min`).join('\n');
     navigator.clipboard.writeText(txt); $('copyVideos').textContent='Copied ✓'; setTimeout(()=>$('copyVideos').textContent='Copy video list',1500);
   };
@@ -1239,7 +1507,9 @@ function refresh(){
   if(!parsedParas) return;
   const cfg=readConfig();
   const rows=buildRows(parsedParas,cfg);
+  if(divideDirty){ splitSet = divideLevel ? splitsForLevel(headingSegments(rows),divideLevel) : new Set(); divideDirty=false; }
   $('preview').innerHTML=renderPreview(rows,cfg);
+  renderHeadingFix(rows,cfg);
   lastSummary=renderDashboard(rows,cfg);
   lastRows=rows; lastCfg=cfg;
 }
@@ -1281,7 +1551,8 @@ async function handleFile(f){
     // if the script uses format-coding signals but no colors, preselect format mode
     if(!detectedColors.length && detectedFormats.length){ document.querySelector('input[name=coding][value=format]').checked=true; toggleCoding(); }
     autoFill(parsedParas); updateLabel();
-    buildColorMap(); buildFormatMap(); buildLevelRows();
+    divideDirty=true; headingOverride={}; renderHeadingFix.opened=false;
+    buildColorMap(); buildFormatMap(); buildLevelRows(); buildStyleRows();
     ['courseCard','settingsCard','summaryCard','genCard'].forEach(id=>$(id).classList.remove('hidden'));
     $('filechip').textContent='📄 '+f.name;
     refresh();
@@ -1300,20 +1571,21 @@ $('fontChoice').addEventListener('change',refresh);
 $('onePerLine').addEventListener('change',refresh);
 $('clean_all').addEventListener('change',e=>{ document.querySelectorAll('.clean').forEach(c=>c.checked=e.target.checked); refresh(); });
 document.querySelectorAll('.clean').forEach(c=>c.addEventListener('change',refresh));
-['style_video','style_graphic','style_script','style_pp'].forEach(id=>$(id).addEventListener('change',refresh));
 document.querySelectorAll('input[name=headingPlace]').forEach(r=>r.addEventListener('change',refresh));
 document.querySelectorAll('input[name=graphicDup]').forEach(r=>r.addEventListener('change',refresh));
 $('noPlayposit').addEventListener('change',()=>{
   const on=$('noPlayposit').checked;
-  $('ppStyleRow').style.display = on ? 'none' : '';
-  buildColorMap(); buildFormatMap();
+  if($('ppStyleRow')) $('ppStyleRow').style.display = on ? 'none' : '';
+  $('hcolPpLabel').style.display = on ? 'none' : '';
+  buildColorMap(); buildFormatMap(); buildLevelRows();
   refresh();
 });
-$('addLevel').addEventListener('click',()=>{ levelTerms.push('Part'); buildLevelRows(); refresh(); });
+document.querySelectorAll('.hcol').forEach(c=>c.addEventListener('change',()=>{ buildLevelRows(); refresh(); }));
+$('addLevel').addEventListener('click',()=>{ levelTerms.push('Part'); divideDirty=true; buildLevelRows(); refresh(); });
 $('course').addEventListener('input',()=>{updateLabel();refresh();});
 $('week').addEventListener('input',()=>{updateLabel();refresh();});
 // delegated listener for dynamically built color/format map selects
-document.addEventListener('change',e=>{ if(e.target.id && (e.target.id.startsWith('cmap_')||e.target.id.startsWith('fmap_'))) refresh(); });
+document.addEventListener('change',e=>{ if(e.target.id && (e.target.id.startsWith('cmap_')||e.target.id.startsWith('fmap_')||e.target.id.startsWith('st_'))) refresh(); });
 
 /* ----- generate ----- */
 $('go').addEventListener('click',async()=>{
@@ -1325,7 +1597,7 @@ $('go').addEventListener('click',async()=>{
     const summary=summarize(rows);
     // if splitting is on, compute video groups and attach to cfg for multi-table output
     cfg.videoGroups = (splitOn && lastVideoGroups && lastVideoGroups.length) ? lastVideoGroups
-                      : (splitOn ? splitVideos(rows,[...splitSet],$('course').value.trim(),$('week').value.trim()) : null);
+                      : (splitOn ? splitVideos(rows,[...splitSet],$('course').value.trim(),$('week').value.trim(),divideLevel) : null);
     const label=updateLabel();
     const blob=await buildDocx(rows,cfg,label,summary);
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`PPD_${label}.docx`; a.click(); URL.revokeObjectURL(a.href);
